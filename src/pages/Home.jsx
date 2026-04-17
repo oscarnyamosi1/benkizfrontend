@@ -4,6 +4,7 @@ import { endpoints } from '../api/client'
 import ProductCard from '../components/ProductCard'
 
 import heroImage from '../assets/hero/hero.jpg'
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 
 const CATEGORIES = [
@@ -260,7 +261,7 @@ export default function Home() {
             <div className="grid-4">
               {team.map(member => {
                 const picUrl = member.profilepic
-                  ? (member.profilepic.startsWith('http') ? member.profilepic : `/media/${member.profilepic}`)
+                  ? (member.profilepic.startsWith('http') ? member.profilepic : `${BASE_URL}${member.profilepic}`)
                   : null
                 return (
                   <div className="team-card" key={member.id}>
