@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import { useWishlist } from '../context/WishlistContext'
 import { useCart } from '../context/CartContext'
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 export default function Wishlist() {
   const { wishItems, removeFromWishlist } = useWishlist()
   const { addToCart } = useCart()
@@ -45,7 +47,7 @@ export default function Wishlist() {
                   {wishItems.map(w => {
                     const item = w.item
                     const imgUrl = item?.thumbnail
-                      ? (item.thumbnail.startsWith('http') ? item.thumbnail : `/media/${item.thumbnail}`)
+                      ? (item.thumbnail.startsWith('http') ? item.thumbnail : `${BASE_URL}${item.thumbnail}`)
                       : null
                     return (
                       <tr key={w.id}>

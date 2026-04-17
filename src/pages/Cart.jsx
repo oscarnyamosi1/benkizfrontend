@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 export default function Cart() {
   const { cart, cartItems, updateCartItem, removeCartItem, loading } = useCart()
 
@@ -45,7 +47,7 @@ export default function Cart() {
                     <tbody>
                       {cartItems.map(ci => {
                         const imgUrl = ci.item?.thumbnail
-                          ? (ci.item.thumbnail.startsWith('http') ? ci.item.thumbnail : `/media/${ci.item.thumbnail}`)
+                          ? (ci.item.thumbnail.startsWith('http') ? ci.item.thumbnail : `${BASE_URL}${ci.item.thumbnail}`)
                           : null
                         return (
                           <tr key={ci.id}>

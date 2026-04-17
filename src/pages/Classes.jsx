@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { endpoints } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 export default function Classes() {
   const { user } = useAuth()
   const [lessons, setLessons] = useState([])
@@ -100,7 +102,7 @@ export default function Classes() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                   {lessons.map(lesson => {
                     const imgUrl = lesson.thumbnail
-                      ? (lesson.thumbnail.startsWith('http') ? lesson.thumbnail : `/media/${lesson.thumbnail}`)
+                      ? (lesson.thumbnail.startsWith('http') ? lesson.thumbnail : `${BASE_URL}${lesson.thumbnail}`)
                       : null
                     const isSelected = selectedIds.includes(lesson.id)
                     const isEnrolled = enrolledIds.includes(lesson.id)
