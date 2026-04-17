@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { endpoints } from '../api/client'
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 export default function Gallery() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -45,7 +47,7 @@ export default function Gallery() {
             <div className="grid-4" style={{ gap: 16 }}>
               {items.map(item => {
                 const imgUrl = item.thumbnail
-                  ? (item.thumbnail.startsWith('http') ? item.thumbnail : `/media/${item.thumbnail}`)
+                  ? (item.thumbnail.startsWith('http') ? item.thumbnail : `${BASE_URL}${item.thumbnail}`)
                   : null
                 return (
                   <div key={item.id} className="card" style={{ cursor: 'pointer', overflow: 'hidden' }} onClick={() => setLightbox(item)}>

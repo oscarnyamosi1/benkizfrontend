@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { endpoints } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 export default function Profile() {
   const { user, profile: authProfile } = useAuth()
   const [profile, setProfile] = useState(authProfile)
@@ -33,7 +35,7 @@ export default function Profile() {
   }
 
   const picUrl = profile?.profilepic
-    ? (profile.profilepic.startsWith('http') ? profile.profilepic : `https://benkizbakers.pythonanywhere.com${profile.profilepic}`)
+    ? (profile.profilepic.startsWith('http') ? profile.profilepic : `${BASE_URL}${profile.profilepic}`)
     : null
 
   return (

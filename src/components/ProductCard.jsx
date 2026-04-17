@@ -3,6 +3,7 @@ import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useAuth } from '../context/AuthContext'
 import { useState } from 'react'
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function ProductCard({ item }) {
   const { user } = useAuth()
@@ -25,7 +26,7 @@ export default function ProductCard({ item }) {
   }
 
   const imgUrl = item.thumbnail
-    ? (item.thumbnail.startsWith('http') ? item.thumbnail : `https://benkizbakers.pythonanywhere.com/${item.thumbnail}`)
+    ? (item.thumbnail.startsWith('http') ? item.thumbnail : `${BASE_URL}${item.thumbnail}`)
     : null
 
   return (

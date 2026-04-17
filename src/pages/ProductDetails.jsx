@@ -6,6 +6,8 @@ import { useWishlist } from '../context/WishlistContext'
 import { useAuth } from '../context/AuthContext'
 import ProductCard from '../components/ProductCard'
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 export default function ProductDetails() {
   const { id } = useParams()
   const { user } = useAuth()
@@ -50,7 +52,7 @@ export default function ProductDetails() {
   )
 
   const imgUrl = item.thumbnail
-    ? (item.thumbnail.startsWith('http') ? item.thumbnail : `https://benkizbakers.pythonanywhere.com${item.thumbnail}`)
+    ? (item.thumbnail.startsWith('http') ? item.thumbnail : `${BASE_URL}${item.thumbnail}`)
     : null
   const wished = isWished(item.id)
 
