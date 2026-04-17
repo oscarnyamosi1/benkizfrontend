@@ -50,7 +50,7 @@ export default function ProductDetails() {
   )
 
   const imgUrl = item.thumbnail
-    ? (item.thumbnail.startsWith('http') ? item.thumbnail : `/media/${item.thumbnail}`)
+    ? (item.thumbnail.startsWith('http') ? item.thumbnail : `https://benkizbakers.pythonanywhere.com/media/${item.thumbnail}`)
     : null
   const wished = isWished(item.id)
 
