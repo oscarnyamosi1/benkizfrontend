@@ -25,7 +25,7 @@ export default function ProductCard({ item }) {
   }
 
   const imgUrl = item.thumbnail
-    ? (item.thumbnail.startsWith('http') ? item.thumbnail : `${item.thumbnail}`)
+    ? (item.thumbnail.startsWith('http') ? item.thumbnail : `https://benkizbakers.pythonanywhere.com/${item.thumbnail}`)
     : null
 
   return (
