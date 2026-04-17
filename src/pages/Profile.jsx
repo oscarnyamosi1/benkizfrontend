@@ -33,7 +33,7 @@ export default function Profile() {
   }
 
   const picUrl = profile?.profilepic
-    ? (profile.profilepic.startsWith('http') ? profile.profilepic : `${profile.profilepic}`)
+    ? (profile.profilepic.startsWith('http') ? profile.profilepic : `https://benkizbakers.pythonanywhere.com${profile.profilepic}`)
     : null
 
   return (
