@@ -34,7 +34,7 @@ export default function ProductCard({ item }) {
       <Link to={`/shop/${item.id}`}>
         <div className="product-card__image-wrap">
           {imgUrl ? (
-            <img className="product-card__image" src={imgUrl} alt={item.name} />
+            <img className="product-card__image" src={imgUrl} alt={item.name} loading="lazy" />
           ) : (
             <div className="product-card__image" style={{ background: 'var(--color-bg-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <i className="fa fa-birthday-cake" style={{ fontSize: 48, color: 'var(--color-border)' }} />

@@ -55,7 +55,9 @@
   --color-primary: #f0b429;
   --color-primary-dark: #d49820;
   --color-primary-light: #3d2e0a;
-  --color-secondary: #f0e8d8;
+  /* --color-secondary: #f0e8d8; */ 
+  /* RESULTS IN UREADABLE TEXT ON THR FOOTER */
+  --color-secondary: #85621a;
   --color-accent: #e8722a;
 
   --color-bg: #111018;

@@ -1,25 +1,40 @@
 import axios from 'axios'
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 
 const api = axios.create({
-  baseURL: 'https://benkizbakers.pythonanywhere.com/api',
-  withCredentials: true,
+  baseURL: `${BASE_URL}/api`,
+  mediaUrl:`${BASE_URL}/media`,
+  // withCredentials: true,            chat gpt doesnt include this in explanation
   headers: { 'Content-Type': 'application/json' },
 })
 
+
+// -----------------------------
+// JWT Interceptor
+// -----------------------------
 api.interceptors.request.use(config => {
-  const csrfToken = getCookie('csrftoken')
-  if (csrfToken) config.headers['X-CSRFToken'] = csrfToken
-  return config
-})
+  const token = localStorage.getItem('jwt'); // access token
+  if (token) config.headers['Authorization'] = `Bearer ${token}`;
+  return config;
+});
 
-function getCookie(name) {
-  const value = `; ${document.cookie}`
-  const parts = value.split(`; ${name}=`)
-  if (parts.length === 2) return parts.pop().split(';').shift()
-  return null
-}
 
-export default api
+// api.interceptors.request.use(config => {
+//   const csrfToken = getCookie('csrftoken')
+//   if (csrfToken) config.headers['X-CSRFToken'] = csrfToken
+//   return config
+// })                          
+// this one uses csrf but the top one uses jwt tokens       ##################
+
+// function getCookie(name) {
+//   const value = `; ${document.cookie}`
+//   const parts = value.split(`; ${name}=`)
+//   if (parts.length === 2) return parts.pop().split(';').shift()
+//   return null
+// }
+// this gets csrf from page or document cookies ##############################
+
 
 export const endpoints = {
   items: {
@@ -29,12 +44,26 @@ export const endpoints = {
     categories: () => api.get('/categories/'),
     featured: () => api.get('/items/featured/'),
   },
+  // auth: {
+  //   login: (data) => api.post('/auth/login/', data),
+  //   logout: () => api.post('/auth/logout/'),
+  //   register: (data) => api.post('/auth/register/', data),
+  //   me: () => api.get('/auth/me/'),
+  //   csrfToken: () => api.get('/auth/csrf/'),
+  // },
   auth: {
-    login: (data) => api.post('/auth/login/', data),
-    logout: () => api.post('/auth/logout/'),
-    register: (data) => api.post('/auth/register/', data),
+    login: async (data) => {
+      const res = await axios.post(`${BASE_URL}/token/`, data);
+      localStorage.setItem('jwt', res.data.access);
+      localStorage.setItem('refresh', res.data.refresh);
+      return res.data;
+    },
+    logout: () => {
+      localStorage.removeItem('jwt');
+      localStorage.removeItem('refresh');
+      return Promise.resolve();
+    },
     me: () => api.get('/auth/me/'),
-    csrfToken: () => api.get('/auth/csrf/'),
   },
   cart: {
     get: () => api.get('/cart/'),
@@ -53,9 +82,29 @@ export const endpoints = {
     unenroll: (lessonId) => api.delete(`/lessons/${lessonId}/unenroll/`),
     basket: () => api.get('/course-basket/'),
   },
+  // profile: {
+  //   get: () => api.get('/profile/'),
+  //   update: (data) => api.patch('/profile/', data),
+  // },
+
   profile: {
-    get: () => api.get('/profile/'),
-    update: (data) => api.patch('/profile/', data),
+    get: async () => {
+      const res = await api.get('/profile/');
+      // attach full media URL for profile picture
+      const profile = res.data;
+      profile.profilepic = mediaUrl(profile.profilepic);
+      return profile;
+    },
+    update: (data) => {
+      // if updating files, use FormData
+      const formData = new FormData();
+      for (let key in data) {
+        formData.append(key, data[key]);
+      }
+      return api.patch('/profile/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    },
   },
   testimonials: {
     list: () => api.get('/testimonials/'),
@@ -78,3 +127,7 @@ export const endpoints = {
     overview: () => api.get('/stats/'),
   },
 }
+
+
+
+export default api;
