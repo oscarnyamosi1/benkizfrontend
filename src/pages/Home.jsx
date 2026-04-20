@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { endpoints } from '../api/client'
 import ProductCard from '../components/ProductCard'
-
+import api from '../api/client'
 import heroImage from '../assets/hero/hero.jpg'
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -218,7 +218,7 @@ export default function Home() {
               position: 'relative',
             }}>
               <img
-                src="../src/assets/hero/hero.jpg"
+                src="hero.jpg"
                 alt="Baking class"
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />

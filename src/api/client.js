@@ -2,9 +2,10 @@ import axios from 'axios'
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 
+export const MEDIA_URL = `${BASE_URL}/media`
+
 const api = axios.create({
   baseURL: `${BASE_URL}/api`,
-  mediaUrl:`${BASE_URL}/media`,
   // withCredentials: true,            chat gpt doesnt include this in explanation
   headers: { 'Content-Type': 'application/json' },
 })

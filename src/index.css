@@ -1169,3 +1169,138 @@ tbody tr:hover { background: var(--color-bg-soft); }
   .profile-header { flex-direction: column; text-align: center; }
   .auth-card { padding: 32px 24px; }
 }
+
+
+/* product card styling  */
+/* Product card category dropdown */
+.product-card__category-wrapper {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  display: inline-block;
+}
+
+.product-card__badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.product-card__badge:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.product-card__dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 160px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 6px 0;
+  display: none;
+  overflow: hidden;
+  z-index: 100;
+  backdrop-filter: blur(6px);
+}
+
+.product-card__dropdown-item {
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.product-card__dropdown-item:hover {
+  background: var(--color-bg-soft);
+  color: var(--color-primary);
+}
+
+.product-card__category-wrapper:hover .product-card__dropdown {
+  display: block;
+}
+
+/* PROFESSIONAL MASONRY GALLERY */
+.gallery-masonry {
+  column-count: 3;
+  column-gap: 20px;
+}
+
+.gallery-tile {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+  break-inside: avoid;
+  border-radius: 22px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  background: white;
+}
+
+.gallery-tile:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.14);
+}
+
+.gallery-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+  display: block;
+}
+
+.gallery-tile:hover img {
+  transform: scale(1.08);
+}
+
+.gallery-overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 18px;
+  background: linear-gradient(to top, rgba(0,0,0,0.65), transparent);
+  color: white;
+}
+
+.gallery-overlay h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.gallery-placeholder {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  background: var(--color-bg-muted);
+}
+
+/* TABLET */
+@media (max-width: 992px) {
+  .gallery-masonry {
+    column-count: 2;
+  }
+}
+
+/* MOBILE */
+@media (max-width: 640px) {
+  .gallery-masonry {
+    column-count: 1;
+  }
+}

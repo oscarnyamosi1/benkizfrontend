@@ -13,7 +13,7 @@ import Footer from './components/Footer'
 import Home from './pages/Home'
 import Shop from './pages/Shop'
 import ProductDetails from './pages/ProductDetails'
-import Gallery from './pages/Gallery'
+import Gallery2 from './pages/Gallery2'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import Contact from './pages/Contact'
@@ -41,7 +41,7 @@ function AppInner() {
           <Route path="/home" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/shop/:id" element={<ProductDetails />} />
-          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/gallery" element={<Gallery2 />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/classes" element={<Classes />} />
           <Route path="/search" element={<Search />} />

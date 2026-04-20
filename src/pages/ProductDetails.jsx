@@ -85,11 +85,28 @@ export default function ProductDetails() {
             </div>
 
             <div>
-              {item.category && (
-                <span className="badge badge-primary" style={{ marginBottom: 16, textTransform: 'capitalize' }}>
-                  {item.category}
-                </span>
-              )}
+           
+           
+{item.category?.length > 0 && (
+  <div
+    className="product-card__category-wrapper"
+    style={{ marginBottom: 16, position: 'relative', display: 'inline-block' }}
+  >
+    <span className="badge badge-primary" style={{ textTransform: 'capitalize' }}>
+      {item.category[0]}
+    </span>
+
+    <div className="product-card__dropdown">
+      {item.category.map((cat, index) => (
+        <div key={index} className="product-card__dropdown-item">
+          {cat}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+
               <h1 style={{ fontSize: 32, fontWeight: 800, margin: '8px 0' }}>{item.name}</h1>
               <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--color-primary)', marginBottom: 16 }}>
                 Shs. {parseFloat(item.price).toLocaleString()}

@@ -40,7 +40,24 @@ export default function ProductCard({ item }) {
               <i className="fa fa-birthday-cake" style={{ fontSize: 48, color: 'var(--color-border)' }} />
             </div>
           )}
-          {item.category && <span className="product-card__badge">{item.category}</span>}
+
+{item.category?.length > 0 && (
+  <div className="product-card__category-wrapper">
+    <span className="product-card__badge">
+      {item.category[0]}
+    </span>
+
+    <div className="product-card__dropdown">
+      {item.category.map((cat, index) => (
+        <div key={index} className="product-card__dropdown-item">
+          {cat}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+
           {user && (
             <button className={`product-card__wish ${wished ? 'wished' : ''}`} onClick={handleWish} title={wished ? 'Remove from wishlist' : 'Add to wishlist'}>
               <i className={`fa${wished ? 's' : 'r'} fa-heart`} />
