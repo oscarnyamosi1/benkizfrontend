@@ -1,134 +1,212 @@
-import axios from 'axios'
+import axios from 'axios';
+
+// -----------------------------
+// ENV
+// -----------------------------
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+if (!BASE_URL) {
+  console.error("❌ VITE_BASE_URL is not defined");
+}
 
-export const MEDIA_URL = `${BASE_URL}/media`
+// -----------------------------
+// MEDIA HELPER (FIXED)
+// -----------------------------
+export const MEDIA_URL = `${BASE_URL}/media`;
 
+const mediaUrl = (path) => {
+  if (!path) return null;
+  if (path.startsWith('http')) return path;
+  return `${MEDIA_URL}/${path}`;
+};
+
+// -----------------------------
+// AXIOS INSTANCE
+// -----------------------------
 const api = axios.create({
   baseURL: `${BASE_URL}/api`,
-  // withCredentials: true,            chat gpt doesnt include this in explanation
   headers: { 'Content-Type': 'application/json' },
-})
-
-
-// -----------------------------
-// JWT Interceptor
-// -----------------------------
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('jwt'); // access token
-  if (token) config.headers['Authorization'] = `Bearer ${token}`;
-  return config;
 });
 
+// -----------------------------
+// REQUEST INTERCEPTOR (JWT)
+// -----------------------------
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-// api.interceptors.request.use(config => {
-//   const csrfToken = getCookie('csrftoken')
-//   if (csrfToken) config.headers['X-CSRFToken'] = csrfToken
-//   return config
-// })                          
-// this one uses csrf but the top one uses jwt tokens       ##################
+// -----------------------------
+// RESPONSE INTERCEPTOR (REFRESH TOKEN)
+// -----------------------------
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const original = error.config;
 
-// function getCookie(name) {
-//   const value = `; ${document.cookie}`
-//   const parts = value.split(`; ${name}=`)
-//   if (parts.length === 2) return parts.pop().split(';').shift()
-//   return null
-// }
-// this gets csrf from page or document cookies ##############################
+    if (error.response?.status === 401 && !original._retry) {
+      original._retry = true;
 
+      const refresh = localStorage.getItem('refresh');
+      if (!refresh) return Promise.reject(error);
 
+      try {
+        const res = await axios.post(`${BASE_URL}/api/token/refresh/`, {
+          refresh,
+        });
+
+        const newAccess = res.data.access;
+        localStorage.setItem('jwt', newAccess);
+
+        original.headers['Authorization'] = `Bearer ${newAccess}`;
+        return api(original);
+      } catch (err) {
+        console.error("🔒 Token refresh failed");
+        localStorage.clear();
+        return Promise.reject(err);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+// -----------------------------
+// SAFE REQUEST WRAPPER
+// -----------------------------
+const safeRequest = async (req) => {
+  try {
+    const res = await req;
+    return res.data;
+  } catch (err) {
+    console.error("API ERROR:", err?.response || err.message);
+    return null; // prevents crashes
+  }
+};
+
+// -----------------------------
+// ENDPOINTS
+// -----------------------------
 export const endpoints = {
   items: {
-    list: (params) => api.get('/items/', { params }),
-    get: (id) => api.get(`/items/${id}/`),
-    search: (query) => api.get('/items/', { params: { search: query } }),
-    categories: () => api.get('/categories/'),
-    featured: () => api.get('/items/featured/'),
+    list: (params) => safeRequest(api.get('/items/', { params })),
+    get: (id) => safeRequest(api.get(`/items/${id}/`)),
+    search: (query) =>
+      safeRequest(api.get('/items/', { params: { search: query } })),
+    categories: () => safeRequest(api.get('/categories/')),
+    featured: () => safeRequest(api.get('/items/featured/')),
   },
-  // auth: {
-  //   login: (data) => api.post('/auth/login/', data),
-  //   logout: () => api.post('/auth/logout/'),
-  //   register: (data) => api.post('/auth/register/', data),
-  //   me: () => api.get('/auth/me/'),
-  //   csrfToken: () => api.get('/auth/csrf/'),
-  // },
+
   auth: {
     login: async (data) => {
-      const res = await axios.post(`${BASE_URL}/token/`, data);
-      localStorage.setItem('jwt', res.data.access);
-      localStorage.setItem('refresh', res.data.refresh);
-      return res.data;
+      try {
+        const res = await axios.post(`${BASE_URL}/api/token/`, data);
+        localStorage.setItem('jwt', res.data.access);
+        localStorage.setItem('refresh', res.data.refresh);
+        return res.data;
+      } catch (err) {
+        console.error("LOGIN ERROR:", err?.response || err.message);
+        return null;
+      }
     },
+
     logout: () => {
       localStorage.removeItem('jwt');
       localStorage.removeItem('refresh');
       return Promise.resolve();
     },
-    me: () => api.get('/auth/me/'),
+
+    me: () => safeRequest(api.get('/auth/me/')),
   },
+
   cart: {
-    get: () => api.get('/cart/'),
-    add: (itemId, quantity = 1) => api.post('/cart/add/', { item_id: itemId, quantity }),
-    update: (cartItemId, quantity) => api.patch(`/cart/items/${cartItemId}/`, { quantity }),
-    remove: (cartItemId) => api.delete(`/cart/items/${cartItemId}/`),
+    get: () => safeRequest(api.get('/cart/')),
+    add: (itemId, quantity = 1) =>
+      safeRequest(api.post('/cart/add/', { item_id: itemId, quantity })),
+    update: (cartItemId, quantity) =>
+      safeRequest(
+        api.patch(`/cart/items/${cartItemId}/`, { quantity })
+      ),
+    remove: (cartItemId) =>
+      safeRequest(api.delete(`/cart/items/${cartItemId}/`)),
   },
+
   wishlist: {
-    get: () => api.get('/wishlist/'),
-    add: (itemId) => api.post('/wishlist/add/', { item_id: itemId }),
-    remove: (itemId) => api.delete(`/wishlist/remove/${itemId}/`),
+    get: () => safeRequest(api.get('/wishlist/')),
+    add: (itemId) =>
+      safeRequest(api.post('/wishlist/add/', { item_id: itemId })),
+    remove: (itemId) =>
+      safeRequest(api.delete(`/wishlist/remove/${itemId}/`)),
   },
+
   classes: {
-    list: () => api.get('/lessons/'),
-    enroll: (lessonId) => api.post(`/lessons/${lessonId}/enroll/`),
-    unenroll: (lessonId) => api.delete(`/lessons/${lessonId}/unenroll/`),
-    basket: () => api.get('/course-basket/'),
+    list: () => safeRequest(api.get('/lessons/')),
+    enroll: (lessonId) =>
+      safeRequest(api.post(`/lessons/${lessonId}/enroll/`)),
+    unenroll: (lessonId) =>
+      safeRequest(api.delete(`/lessons/${lessonId}/unenroll/`)),
+    basket: () => safeRequest(api.get('/course-basket/')),
   },
-  // profile: {
-  //   get: () => api.get('/profile/'),
-  //   update: (data) => api.patch('/profile/', data),
-  // },
 
   profile: {
     get: async () => {
-      const res = await api.get('/profile/');
-      // attach full media URL for profile picture
-      const profile = res.data;
-      profile.profilepic = mediaUrl(profile.profilepic);
-      return profile;
+      const data = await safeRequest(api.get('/profile/'));
+      if (!data) return null;
+
+      return {
+        ...data,
+        profilepic: mediaUrl(data.profilepic),
+      };
     },
-    update: (data) => {
-      // if updating files, use FormData
-      const formData = new FormData();
-      for (let key in data) {
-        formData.append(key, data[key]);
+
+    update: async (data) => {
+      try {
+        const formData = new FormData();
+        for (let key in data) {
+          formData.append(key, data[key]);
+        }
+
+        const res = await api.patch('/profile/', formData);
+        return res.data;
+      } catch (err) {
+        console.error("PROFILE UPDATE ERROR:", err);
+        return null;
       }
-      return api.patch('/profile/', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
     },
   },
+
   testimonials: {
-    list: () => api.get('/testimonials/'),
-    create: (data) => api.post('/testimonials/', data),
+    list: () => safeRequest(api.get('/testimonials/')),
+    create: (data) => safeRequest(api.post('/testimonials/', data)),
   },
+
   team: {
-    list: () => api.get('/team/'),
+    list: () => safeRequest(api.get('/team/')),
   },
+
   locations: {
-    list: () => api.get('/locations/'),
+    list: () => safeRequest(api.get('/locations/')),
   },
+
   contact: {
-    send: (data) => api.post('/contact/', data),
+    send: (data) => safeRequest(api.post('/contact/', data)),
   },
+
   checkout: {
-    complete: (data) => api.post('/checkout/', data),
-    status: (ref) => api.get(`/payment-status/${ref}/`),
+    complete: (data) => safeRequest(api.post('/checkout/', data)),
+    status: (ref) =>
+      safeRequest(api.get(`/payment-status/${ref}/`)),
   },
+
   stats: {
-    overview: () => api.get('/stats/'),
+    overview: () => safeRequest(api.get('/stats/')),
   },
-}
-
-
+};
 
 export default api;
