@@ -327,32 +327,47 @@ export default function Home() {
       <section className="social-section spad">
         <div className="container">
           <div className="grid-2" style={{ alignItems: 'center', gap: 60 }}>
+            
             <div>
               <div className="section-title">
                 <span>Follow Us on TikTok</span>
                 <h2>Sweet moments are saved as memories</h2>
               </div>
+
               <p style={{ color: 'var(--color-text-muted)', marginBottom: 24 }}>
                 <i className="fab fa-tiktok" /> @benkizbakers
               </p>
-              <a href="https://wa.me/254707091550" className="btn btn-primary" target="_blank" rel="noopener noreferrer">
+
+              <a
+                href="https://wa.me/254707091550"
+                className="btn btn-primary"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <i className="fab fa-whatsapp" /> Follow on Social
               </a>
             </div>
-            <div className="social-grid">
-              {[1, 2, 3, 4, 5, 6].map(n => (
-                <div key={n} className="social-grid-item">
-                  <img
-                    src={`/media/img/instagram/instagram-${Math.min(n, 5)}.jpg`}
-                    alt={`Gallery ${n}`}
-                    onError={e => {
-                      e.target.style.display = 'none'
-                      e.target.parentElement.style.background = 'var(--color-bg-muted)'
-                    }}
-                  />
-                </div>
-              ))}
+
+            {/* ❌ INSTAGRAM GRID REMOVED COMPLETELY */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'var(--color-bg-soft)',
+                borderRadius: 'var(--radius-xl)',
+                padding: 40,
+                minHeight: 200,
+                color: 'var(--color-text-muted)',
+                textAlign: 'center',
+              }}
+            >
+              <div>
+                <i className="fa fa-camera" style={{ fontSize: 40, marginBottom: 12 }} />
+                <p>Gallery section removed</p>
+              </div>
             </div>
+
           </div>
         </div>
       </section>
