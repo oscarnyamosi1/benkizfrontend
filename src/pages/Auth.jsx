@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-
 export default function Auth() {
   const { login, register, user } = useAuth()
+  
   const navigate = useNavigate()
   const [tab, setTab] = useState('login')
   const [error, setError] = useState('')
