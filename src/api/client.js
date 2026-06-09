@@ -43,9 +43,10 @@ api.interceptors.response.use(
         });
 
         return api(original);
-      } catch (e) {
+      } catch (error) {
+        await api.get("/auth/csrf/", { withCredentials: true });
         window.location.href = "/login";
-        return Promise.reject(e);
+        return Promise.reject(error);
       }
     }
 
@@ -74,10 +75,11 @@ export const endpoints = {
 
 auth: {
 
-  login: async (credentials) => {
-    await api.get("/auth/csrf/", { withCredentials: true });  
+  login: async  (credentials) => {
+await api.get("/auth/csrf/", { withCredentials: true });
     return api.post("/auth/login/", credentials)
-  },
+  }
+    ,
 
   logout: () =>
     api.post("/auth/logout/"),
@@ -86,9 +88,10 @@ auth: {
     api.get("/auth/me/"),
 
   refreshToken: async () => {
-    await api.get("/auth/csrf/", { withCredentials: true });
-    return refreshApi.post("/refresh/");
-  },
+await api.get("/auth/csrf/", { withCredentials: true });
+    return refreshApi.post("/refresh/")
+  }
+    ,
   
 },
 
@@ -156,7 +159,7 @@ auth: {
     products: {
       list:   (params)       => api.post('/admin/products/', { params }),
       get:    (id)           => api.get(`/admin/products/${id}/`),
-      create: (data)         => api.post('/admin/products/', data),
+      create: (data)         => api.create('/admin/products/create/', data),
       update: (id, data)     => api.patch(`/admin/products/edit/`, data),
       delete: (id)           => api.delete(`/admin/products/${id}/`),
     },
