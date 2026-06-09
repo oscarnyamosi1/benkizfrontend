@@ -74,9 +74,10 @@ export const endpoints = {
 
 auth: {
 
-  login:  (credentials) => 
-    api.post("/auth/login/", credentials)
-  ,
+  login: async (credentials) => {
+    await api.get("/auth/csrf/", { withCredentials: true });  
+    return api.post("/auth/login/", credentials)
+  },
 
   logout: () =>
     api.post("/auth/logout/"),
@@ -84,8 +85,10 @@ auth: {
   me: () =>
     api.get("/auth/me/"),
 
-  refreshToken: () =>
-    refreshApi.post("/refresh/"),
+  refreshToken: async () => {
+    await api.get("/auth/csrf/", { withCredentials: true });
+    return refreshApi.post("/refresh/");
+  },
   
 },
 
