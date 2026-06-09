@@ -21,7 +21,7 @@ export default function Footer() {
 
           <div style={{ textAlign: 'center' }}>
             <img
-              src="../src/assets/logo.webp"
+              src="/logo.webp"
               alt="Benkiz Bakers"
               style={{height: 80, margin: '0 auto 16px' }}
             />
