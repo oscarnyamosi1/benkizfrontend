@@ -38,13 +38,13 @@ api.interceptors.response.use(
       original._retry = true;
 
       try {
-        await axios.post(`${BASE_URL}/api/refresh/`, {}, {
+        // ALWAYS use same axios instance + same domain
+        await api.post("/auth/refresh/", {}, {
           withCredentials: true
         });
 
         return api(original);
       } catch (error) {
-        await api.get("/auth/csrf/", { withCredentials: true });
         window.location.href = "/login";
         return Promise.reject(error);
       }
@@ -88,11 +88,13 @@ await api.get("/auth/csrf/", { withCredentials: true });
     api.get("/auth/me/"),
 
   refreshToken: async () => {
-await api.get("/auth/csrf/", { withCredentials: true });
-    return refreshApi.post("/auth/refresh/")
-  }
-    ,
-  
+    await api.get("/auth/csrf/", { withCredentials: true });
+
+    return api.post("/auth/refresh/", {}, {
+      withCredentials: true
+    });
+  },
+    
 },
 
   cart: {
