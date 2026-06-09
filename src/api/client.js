@@ -56,7 +56,7 @@ api.interceptors.response.use(
 
 
 const refreshApi = axios.create({
-  baseURL: BASE_URL,
+  baseURL: `${BASE_URL}/api`,
   withCredentials: true
 })
 
@@ -89,7 +89,7 @@ await api.get("/auth/csrf/", { withCredentials: true });
 
   refreshToken: async () => {
 await api.get("/auth/csrf/", { withCredentials: true });
-    return refreshApi.post("/refresh/")
+    return refreshApi.post("/auth/refresh/")
   }
     ,
   
