@@ -13,14 +13,7 @@ if (!BASE_URL) {
 const api = axios.create({
   baseURL: `${BASE_URL}/api`,
   withCredentials: true,
-
-  headers: {
-    "Content-Type": "application/json",
-  },
-
-  xsrfCookieName: "csrftoken",
-  xsrfHeaderName: "X-CSRFToken",
-})
+});
 
 // ---------------------------------------------------------------------------
 // MEDIA URL HELPER
@@ -35,90 +28,36 @@ export const mediaUrl = (path) => {
 // REQUEST INTERCEPTOR — attach access token from memory
 // ---------------------------------------------------------------------------
 
-let isRefreshing = false
-let failedQueue = []
-
-const processQueue = (error) => {
-  failedQueue.forEach(({ resolve, reject }) => {
-    if (error) reject(error)
-    else resolve()
-  })
-
-  failedQueue = []
-}
-
-
 
 api.interceptors.response.use(
-  (response) => response,
+  response => response,
+  async err => {
+    const original = err.config;
 
-  async (error) => {
-    const originalRequest = error.config
-
-    const isAuthRoute =
-      originalRequest.url?.includes('/auth/login/') ||
-      originalRequest.url?.includes('/auth/register/') ||
-      originalRequest.url?.includes('/auth/logout/') ||
-      originalRequest.url?.includes('/auth/me/') ||
-      originalRequest.url?.includes('/refresh/')
-
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !isAuthRoute
-    ) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject })
-        }).then(() => api(originalRequest))
-      }
-
-      originalRequest._retry = true
-      isRefreshing = true
+    if (err.response?.status === 401 && !original._retry) {
+      original._retry = true;
 
       try {
-        // FIXED: ensure refresh always hits correct endpoint
-        await refreshApi.post('/refresh/')
+        await axios.post(`${BASE_URL}/api/refresh/`, {}, {
+          withCredentials: true
+        });
 
-        processQueue(null)
-
-        return api(originalRequest)
-
-      } catch (refreshError) {
-        processQueue(refreshError)
-
-        if (window.location.pathname !== '/login/') {
-          window.location.href = '/login'
-        }
-
-        return Promise.reject(refreshError)
-
-      } finally {
-        isRefreshing = false
+        return api(original);
+      } catch (e) {
+        window.location.href = "/login";
+        return Promise.reject(e);
       }
     }
 
-    return Promise.reject(error)
+    return Promise.reject(err);
   }
-)
+);
 
 
 const refreshApi = axios.create({
   baseURL: BASE_URL,
   withCredentials: true
 })
-
-
-// ---------------------------------------------------------------------------
-// RESPONSE INTERCEPTOR — silent token refresh on 401
-// When the access token expires the backend returns 401.
-// We call /api/token/refresh/ (Django SimpleJWT endpoint) which reads the
-// httpOnly refresh-token cookie and returns a new access token in the body.
-// We store that in memory and replay the original request once.
-// ---------------------------------------------------------------------------
-
-
-
 
 // ---------------------------------------------------------------------------
 // ENDPOINTS
@@ -134,10 +73,10 @@ export const endpoints = {
   },
 
 auth: {
-  csrf: () => api.get("/auth/csrf/"),
 
-  login: (credentials) =>
-    api.post("/auth/login/", credentials),
+  login:  (credentials) => 
+    api.post("/auth/login/", credentials)
+  ,
 
   logout: () =>
     api.post("/auth/logout/"),
@@ -146,7 +85,8 @@ auth: {
     api.get("/auth/me/"),
 
   refreshToken: () =>
-    refreshApi.post("/refresh/")
+    refreshApi.post("/refresh/"),
+  
 },
 
   cart: {
