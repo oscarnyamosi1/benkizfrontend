@@ -25,15 +25,15 @@ export default function ProductCard({ item }) {
     wished ? await removeFromWishlist(item.id) : await addToWishlist(item.id)
   }
 
-  // const imgUrl = item.thumbnail_url
-  //   ? (item.thumbnail_url.startsWith('http') ? item.thumbnail_url : `${BASE_URL}${item.thumbnail_url}`)
+  // const imgUrl = item.thumbnail
+  //   ? (item.thumbnail.startsWith('http') ? item.thumbnail : `${BASE_URL}${item.thumbnail}`)
   //   : null
 
 
   const[imgUrl,setImgUrl]=useState('')
   useEffect(() => {
-    setImgUrl(item.thumbnail_url)
-  }, [item.thumbnail_url])
+    setImgUrl(item.thumbnail)
+  }, [item.thumbnail])
 
 
   const useDefaultImage = ()=>{

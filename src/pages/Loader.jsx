@@ -7,8 +7,8 @@ export default function Loader() {
      
     <div id="loader">
         <div className="logo"><img src="/logo.webp" style={{width:70,}} alt="benkiz logo" /></div>
-        <div class="loader-logo">Benkiz <span>Bakers.</span></div>
-        <div class="loader-bar"><div class="loader-fill"></div></div>
+        <div className="loader-logo">Benkiz <span>Bakers.</span></div>
+        <div className="loader-bar"><div className="loader-fill"></div></div>
         <div style={{display:"none"}}>
             {setTimeout(showLoader,2500)}
         </div>

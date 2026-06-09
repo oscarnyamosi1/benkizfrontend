@@ -43,7 +43,7 @@ export default function Navbar() {
         <div className="container">
           <div className="navbar__inner">
             <Link to="/" className="navbar__logo">
-              <img src="favicon.svg" alt="Benkiz Bakers" />
+              <img src="/favicon.svg" alt="Benkiz Bakers" />
             </Link>
 
             <div className="navbar__links">
@@ -116,7 +116,7 @@ export default function Navbar() {
       <div className={`offcanvas-overlay ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(false)} />
       <div className={`offcanvas ${menuOpen ? 'open' : ''}`}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <img src="../src/assets/logo.webp" alt="Benkiz Bakers" style={{ height: 40 }} />
+          <img src="/logo.webp" alt="Benkiz Bakers" style={{ height: 40 }} />
           <button className="navbar__icon-btn" onClick={() => setMenuOpen(false)}>
             <i className="fa fa-times" />
           </button>

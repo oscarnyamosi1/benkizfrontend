@@ -65,7 +65,7 @@ export default function Auth() {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-card__logo">
-          <img src="../src/assets/logo.webp" alt="Benkiz Bakers" />
+          <img src="/logo.webp" alt="Benkiz Bakers" />
         </div>
 
         {/* ── Demo banner ── */}

@@ -1,21 +1,23 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-const YOUR_CLOUD_NAME = import.meta.env.VITE_YOUR_CLOUD_NAME
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
 
-export const uploadToCloudinary = async (file:any) => {
+export const uploadToCloudinary = async (file: File) => {
   const formData = new FormData();
 
   formData.append("file", file);
-  formData.append("upload_preset", "YOUR_UNSIGNED_PRESET");
+  formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_PRESET);
+
+  // store in my folder
+  formData.append("folder", "benkiz_images");
 
   const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${YOUR_CLOUD_NAME}/image/upload`,
+    `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_YOUR_CLOUD_NAME}/image/upload`,
     {
       method: "POST",
       body: formData,
@@ -28,5 +30,9 @@ export const uploadToCloudinary = async (file:any) => {
     throw new Error(data.error?.message || "Upload failed");
   }
 
-  return data.secure_url;
+  // STORE ONLY RAW DATA (NO TRANSFORMS)
+  return {
+    url: data.secure_url,
+    public_id: data.public_id,
+  };
 };

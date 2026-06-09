@@ -211,10 +211,10 @@ auth: {
     dashboard: () => api.get('/admin/dashboard/'),
 
     products: {
-      list:   (params)       => api.get('/admin/products/', { params }),
+      list:   (params)       => api.post('/admin/products/', { params }),
       get:    (id)           => api.get(`/admin/products/${id}/`),
       create: (data)         => api.post('/admin/products/', data),
-      update: (id, data)     => api.patch(`/admin/products/${id}/`, data),
+      update: (id, data)     => api.patch(`/admin/products/edit/`, data),
       delete: (id)           => api.delete(`/admin/products/${id}/`),
     },
 

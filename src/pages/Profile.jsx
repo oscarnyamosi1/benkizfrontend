@@ -6,19 +6,12 @@ import { useAuth } from '../context/AuthContext'
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function Profile() {
-  const { user, profile: authProfile } = useAuth()
-  const [profile, setProfile] = useState(authProfile)
+  const { user, profile } = useAuth()
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({})
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
-  useEffect(() => {
-    endpoints.profile.get().then(r => {
-      setProfile(r.data)
-      setForm(r.data)
-    }).catch(() => {})
-  }, [])
 
   async function handleSave(e) {
     e.preventDefault()
