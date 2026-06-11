@@ -12,6 +12,9 @@ if (!BASE_URL) {
 
 const api = axios.create({
   baseURL: `${BASE_URL}/api`,
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("access")}`
+  },
   withCredentials: true,
 });
 
@@ -28,36 +31,61 @@ export const mediaUrl = (path) => {
 // REQUEST INTERCEPTOR — attach access token from memory
 // ---------------------------------------------------------------------------
 
+async function refreshToken() {
+  const refresh = localStorage.getItem("refresh");
 
-api.interceptors.response.use(
-  response => response,
+  const res = await axios.post("/api/auth/refresh/", {
+    refresh
+  });
+
+  localStorage.setItem("access", res.data.access);
+
+  return res.data.access;
+}
+
+
+// api.interceptors.response.use(
+//   response => response,
+//   async err => {
+//     const original = err.config;
+
+//     // prevent retry loop on refresh + auth endpoints
+//     const isAuthEndpoint =
+//       original.url?.includes("/auth/refresh/") ||
+//       original.url?.includes("/auth/login/") ||
+//       original.url?.includes("/auth/logout/");
+
+//     if (isAuthEndpoint) {
+//       return Promise.reject(err);
+//     }
+
+//     if (err.response?.status === 401 && !original._retry) {
+//       original._retry = true;
+
+//       try {
+//         await api.post("/auth/refresh/", {}, { withCredentials: true });
+
+//         return api(original);
+//       } catch (error) {
+//         // IMPORTANT: do NOT retry again
+//         window.location.href = "/login";
+//         return Promise.reject(error);
+//       }
+//     }
+
+//     return Promise.reject(err);
+//   }
+// );
+
+axios.interceptors.response.use(
+  res => res,
   async err => {
-    const original = err.config;
+    if (err.response?.status === 401) {
+      const newAccess = await refreshToken();
 
-    // prevent retry loop on refresh + auth endpoints
-    const isAuthEndpoint =
-      original.url?.includes("/auth/refresh/") ||
-      original.url?.includes("/auth/login/") ||
-      original.url?.includes("/auth/logout/");
-
-    if (isAuthEndpoint) {
-      return Promise.reject(err);
+      err.config.headers.Authorization = `Bearer ${newAccess}`;
+      return axios(err.config);
     }
-
-    if (err.response?.status === 401 && !original._retry) {
-      original._retry = true;
-
-      try {
-        await api.post("/auth/refresh/", {}, { withCredentials: true });
-
-        return api(original);
-      } catch (error) {
-        // IMPORTANT: do NOT retry again
-        window.location.href = "/login";
-        return Promise.reject(error);
-      }
-    }
-
     return Promise.reject(err);
   }
 );
@@ -84,8 +112,10 @@ export const endpoints = {
 auth: {
 
   login: async  (credentials) => {
-await api.get("/auth/csrf/", { withCredentials: true });
-    return api.post("/auth/login/", credentials)
+    const res = await axios.post("/api/auth/login/", credentials);
+
+    localStorage.setItem("access", res.data.access);
+    localStorage.setItem("refresh", res.data.refresh);
   }
     ,
 
