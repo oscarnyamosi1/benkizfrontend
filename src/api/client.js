@@ -34,17 +34,25 @@ api.interceptors.response.use(
   async err => {
     const original = err.config;
 
+    // prevent retry loop on refresh + auth endpoints
+    const isAuthEndpoint =
+      original.url?.includes("/auth/refresh/") ||
+      original.url?.includes("/auth/login/") ||
+      original.url?.includes("/auth/logout/");
+
+    if (isAuthEndpoint) {
+      return Promise.reject(err);
+    }
+
     if (err.response?.status === 401 && !original._retry) {
       original._retry = true;
 
       try {
-        // ALWAYS use same axios instance + same domain
-        await api.post("/auth/refresh/", {}, {
-          withCredentials: true
-        });
+        await api.post("/auth/refresh/", {}, { withCredentials: true });
 
         return api(original);
       } catch (error) {
+        // IMPORTANT: do NOT retry again
         window.location.href = "/login";
         return Promise.reject(error);
       }
