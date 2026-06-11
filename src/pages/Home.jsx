@@ -88,7 +88,7 @@ export default function Home() {
   return (
     <>
       {/* HERO */}
-     <Loader />
+     {loading && <Loader />}
       <section className="hero">
         <div className="hero__slide active" style={{ backgroundImage: `url(${heroBg})` }} />
         <div className="hero__overlay" />
