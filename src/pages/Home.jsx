@@ -38,22 +38,28 @@ export default function Home() {
   useEffect(() => {
     async function load() {
       try {
-        const [itemsRes, teamRes, testRes] = await Promise.allSettled([
-          endpoints.items.list({ limit: 8 }),
+        const [teamRes, testRes] = await Promise.allSettled([
+   
           endpoints.team.list(),
           endpoints.testimonials.list(),
         ])
-        if (itemsRes.status === 'fulfilled') {
-          const d = itemsRes.value.data
-          setItems(Array.isArray(d?.results) ? d.results : Array.isArray(d) ? d : [])
+        // if (itemsRes.status === 'fulfilled') {
+        //   const data = itemsRes.value.data
+        //   setItems(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [])
+        // }
+        const itemsdata = async () =>{
+          const res = await endpoints.items.list({ limit: 8 })
+          return res.data
         }
+        setItems(itemsdata)
+
         if (teamRes.status === 'fulfilled') {
-          const d = teamRes.value.data
-          setTeam(Array.isArray(d?.results) ? d.results : Array.isArray(d) ? d : [])
+          const data = teamRes.value.data
+          setTeam(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [])
         }
         if (testRes.status === 'fulfilled') {
-          const d = testRes.value.data
-          setTestimonials(Array.isArray(d?.results) ? d.results : Array.isArray(d) ? d : [])
+          const data = testRes.value.data
+          setTestimonials(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [])
         }
       } finally {
         setLoading(false)
