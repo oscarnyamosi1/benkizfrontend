@@ -80,13 +80,32 @@ async function refreshToken() {
 axios.interceptors.response.use(
   res => res,
   async err => {
-    if (err.response?.status === 401) {
+    const originalRequest = err.config;
+
+    if (!originalRequest || err.response?.status !== 401) {
+      return Promise.reject(err);
+    }
+
+    // prevent refresh endpoint loop
+    if (originalRequest.url.includes("/refresh")) {
+      return Promise.reject(err);
+    }
+
+    // prevent infinite retry
+    if (originalRequest._retry) {
+      return Promise.reject(err);
+    }
+    originalRequest._retry = true;
+
+    try {
       const newAccess = await refreshToken();
 
-      err.config.headers.Authorization = `Bearer ${newAccess}`;
-      return axios(err.config);
+      originalRequest.headers.Authorization = `Bearer ${newAccess}`;
+
+      return axios(originalRequest);
+    } catch (refreshError) {
+      return Promise.reject(refreshError);
     }
-    return Promise.reject(err);
   }
 );
 
