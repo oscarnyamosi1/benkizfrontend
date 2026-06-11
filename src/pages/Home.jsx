@@ -31,7 +31,7 @@ export default function Home() {
   const [heros, setHeros] = useState([])
   const [team, setTeam] = useState([])
   const [testimonials, setTestimonials] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [itemsLoading, setItemsLoading] = useState(true)
   const [heroIndex, setHeroIndex] = useState(0)
   const heroTimer = useRef(null)
 
@@ -56,7 +56,7 @@ export default function Home() {
           setTestimonials(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [])
         }
       } finally {
-        setLoading(false)
+        setItemsLoading(false)
       }
     }
     load()
@@ -88,7 +88,7 @@ export default function Home() {
   return (
     <>
       {/* HERO */}
-     {loading && <Loader />}
+     <Loader />
       <section className="hero">
         <div className="hero__slide active" style={{ backgroundImage: `url(${heroBg})` }} />
         <div className="hero__overlay" />
@@ -175,7 +175,7 @@ export default function Home() {
             <span>Fresh Picks</span>
             <h2>Our Most Loved Creations</h2>
           </div>
-          {loading ? (
+          {itemsLoading ? (
             <div className="page-loading"><div className="spinner" /></div>
           ) : items.length === 0 ? (
             <div className="empty-state">
