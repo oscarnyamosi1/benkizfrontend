@@ -32,34 +32,58 @@ export const mediaUrl = (path) => {
 async function refreshToken() {
   const refresh = localStorage.getItem("refresh");
 
-  if (!refresh) {
-    throw new Error("No refresh token found");
-  }
+  if (!refresh) throw new Error("No refresh token found");
 
-  const res = await api.post("/auth/refresh/", {
-    refresh,
-  });
+  const res = await api.post("/auth/refresh/", { refresh });
 
-  const newAccess = res.data.access;
+  localStorage.setItem("access", res.data.access);
 
-  localStorage.setItem("access", newAccess);
-
-  return newAccess;
+  return res.data.access;
 }
 
 // ---------------------------------------------------------------------------
 // REQUEST INTERCEPTOR (attach access token)
 // ---------------------------------------------------------------------------
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access");
+api.interceptors.response.use(
+  (res) => res,
+  async (err) => {
+    const original = err.config;
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    if (!original || err.response?.status !== 401) {
+      return Promise.reject(err);
+    }
+
+    const url = original.url || "";
+
+    if (
+      url.includes("/auth/login/") ||
+      url.includes("/auth/logout/") ||
+      url.includes("/auth/refresh/")
+    ) {
+      return Promise.reject(err);
+    }
+
+    if (original._retry) {
+      return Promise.reject(err);
+    }
+
+    original._retry = true;
+
+    try {
+      const newAccess = await refreshToken();
+
+      original.headers.Authorization = `Bearer ${newAccess}`;
+
+      return api(original);
+    } catch (e) {
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+      window.location.href = "/login";
+      return Promise.reject(e);
+    }
   }
-
-  return config;
-});
+);
 
 // ---------------------------------------------------------------------------
 // RESPONSE INTERCEPTOR (SAFE REFRESH FLOW)
