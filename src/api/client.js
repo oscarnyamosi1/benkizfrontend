@@ -145,6 +145,17 @@ export const endpoints = {
     categories: () => api.get("/categories/"),
     featured: () => api.get("/items/featured/"),
   },
+  
+  admin: {
+    dashboard: () => api.get('/admin/dashboard/'),
+
+    products: {
+      list:   (params)       => api.post('/admin/products/', { params }),
+      get:    (id)           => api.get(`/admin/products/${id}/`),
+      create: (data)         => api.create('/admin/products/create/', data),
+      update: (id, data)     => api.patch(`/admin/products/edit/`, data),
+      delete: (id)           => api.delete(`/admin/products/${id}/`),
+    },
 
   auth: {
     login: async (credentials) => {
