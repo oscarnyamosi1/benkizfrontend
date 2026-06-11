@@ -31,32 +31,32 @@ export default function Home() {
   const [heros, setHeros] = useState([])
   const [team, setTeam] = useState([])
   const [testimonials, setTestimonials] = useState([])
-  const [itemsLoading, setItemsLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [heroIndex, setHeroIndex] = useState(0)
   const heroTimer = useRef(null)
 
   useEffect(() => {
     async function load() {
       try {
-        const [ teamRes, testRes] = await Promise.allSettled([
-          
+        const [itemsRes, teamRes, testRes] = await Promise.allSettled([
+          endpoints.items.list({ limit: 8 }),
           endpoints.team.list(),
           endpoints.testimonials.list(),
         ])
-
-        const data = endpoints.items.list({ limit: 8 })
-        setItems(data ? data : [])
-
+        if (itemsRes.status === 'fulfilled') {
+          const data = itemsRes.value.data
+          setItems(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [])
+        }
         if (teamRes.status === 'fulfilled') {
-          const data2 = teamRes.value.data
-          setTeam(Array.isArray(data2?.results) ? data2.results : Array.isArray(data2) ? data2 : [])
+          const data = teamRes.value.data
+          setTeam(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [])
         }
         if (testRes.status === 'fulfilled') {
-          const data3 = testRes.value.data
-          setTestimonials(Array.isArray(data3?.results) ? data3.results : Array.isArray(data3) ? data3 : [])
+          const data = testRes.value.data
+          setTestimonials(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [])
         }
       } finally {
-        setItemsLoading(false)
+        setLoading(false)
       }
     }
     load()
@@ -89,6 +89,7 @@ export default function Home() {
     <>
       {/* HERO */}
      <Loader />
+     {load()}
       <section className="hero">
         <div className="hero__slide active" style={{ backgroundImage: `url(${heroBg})` }} />
         <div className="hero__overlay" />
@@ -175,7 +176,7 @@ export default function Home() {
             <span>Fresh Picks</span>
             <h2>Our Most Loved Creations</h2>
           </div>
-          {itemsLoading ? (
+          {loading ? (
             <div className="page-loading"><div className="spinner" /></div>
           ) : items.length === 0 ? (
             <div className="empty-state">
