@@ -18,13 +18,15 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     async function bootSession() {
       try {
-        const token = await endpoints.auth.refreshToken()
+        // const token = await endpoints.auth.refreshToken()
+        const token = await endpoints.auth.me()
         if (token) {
           await fetchMe()
         }
-      } catch {
-        // no valid session — stay logged out
-      } finally {
+      } catch (err) {
+      setUser(null)
+      setProfile(null)
+    } finally {
         setLoading(false)
       }
     }
