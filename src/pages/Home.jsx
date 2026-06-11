@@ -45,7 +45,9 @@ export default function Home() {
         ])
         if (itemsRes.status === 'fulfilled') {
           const data = itemsRes.value.data
+          console.log(`your data ====>  ${data}`)
           setItems(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [])
+          setItems(data)
         }
         if (teamRes.status === 'fulfilled') {
           const data = teamRes.value.data
