@@ -38,22 +38,22 @@ export default function Home() {
   useEffect(() => {
     async function load() {
       try {
-        const [itemsRes, teamRes, testRes] = await Promise.allSettled([
-          endpoints.items.list({ limit: 8 }),
+        const [ teamRes, testRes] = await Promise.allSettled([
+          
           endpoints.team.list(),
           endpoints.testimonials.list(),
         ])
-        if (itemsRes.status === 'fulfilled') {
-          const data = itemsRes.value.data
-          setItems(Array.isArray(data) ? data : [])
-        }
+
+        const data = endpoints.items.list({ limit: 8 })
+        setItems(data ? data : [])
+
         if (teamRes.status === 'fulfilled') {
-          const data = teamRes.value.data
-          setTeam(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [])
+          const data2 = teamRes.value.data
+          setTeam(Array.isArray(data2?.results) ? data2.results : Array.isArray(data2) ? data2 : [])
         }
         if (testRes.status === 'fulfilled') {
-          const data = testRes.value.data
-          setTestimonials(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [])
+          const data3 = testRes.value.data
+          setTestimonials(Array.isArray(data3?.results) ? data3.results : Array.isArray(data3) ? data3 : [])
         }
       } finally {
         setItemsLoading(false)
