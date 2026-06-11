@@ -89,7 +89,6 @@ export default function Home() {
     <>
       {/* HERO */}
      <Loader />
-     {load()}
       <section className="hero">
         <div className="hero__slide active" style={{ backgroundImage: `url(${heroBg})` }} />
         <div className="hero__overlay" />
