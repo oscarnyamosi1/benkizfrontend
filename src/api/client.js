@@ -98,7 +98,7 @@ await api.get("/auth/csrf/", { withCredentials: true });
   refreshToken: async () => {
     await api.get("/auth/csrf/", { withCredentials: true });
 
-    return api.post("/auth/refresh/", {}, {
+    return api.get("/auth/refresh/", {}, {
       withCredentials: true
     });
   },
