@@ -129,7 +129,7 @@ export const endpoints = {
       localStorage.setItem("access", res.data.access);
       localStorage.setItem("refresh", res.data.refresh);
 
-      return res.data.user;
+      return res.data;
     },
 
     logout: () => api.post("/auth/logout/"),

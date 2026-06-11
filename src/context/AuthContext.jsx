@@ -37,10 +37,10 @@ export function AuthProvider({ children }) {
     setProfile(res.data.profile ?? null)
   }
 
-  async function login(username, password) {
+  function login(username, password) {
     // client.js stores the access token in memory; backend sets the
     // httpOnly refresh-token cookie — no localStorage touched here.
-    const res = await endpoints.auth.login({ username, password })
+    const res = endpoints.auth.login({ username, password })
 
     setUser(res.data.user ?? res.data)
     setProfile(res.data.profile ?? null)
