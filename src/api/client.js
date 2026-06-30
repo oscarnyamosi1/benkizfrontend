@@ -41,14 +41,14 @@ export const tokenManager = {
 // AXIOS INSTANCES
 // ---------------------------------------------------------------------------
 const api = axios.create({
-  baseURL: `${BASE_URL}${API_PATH}`,
+  baseURL: `${API_PATH}`,
   withCredentials: true,
   timeout: 30000,
 });
 
 // Separate instance for refresh to avoid interceptor loops
 const refreshApi = axios.create({
-  baseURL: `${BASE_URL}${API_PATH}`,
+  baseURL: `${API_PATH}`,
   withCredentials: true,
   timeout: 10000,
 });
