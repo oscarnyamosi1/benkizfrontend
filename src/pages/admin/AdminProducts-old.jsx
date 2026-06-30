@@ -2,19 +2,18 @@ import { useState, useEffect, useRef } from "react";
 import { endpoints } from "../../api/client";
 import { uploadToCloudinary } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
-import "./styles/admin-products.css"; // We'll create this CSS file
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const EMPTY_FORM = {
-  id: "",
+  id:"",
   name: "",
   description: "",
   price: "",
   category: "",
   stock: "",
   imageUrl: "",
-  imagePublicId: "",
+  imagePublicId: "", 
 };
 
 const CATEGORIES = [
@@ -88,7 +87,10 @@ export default function AdminProducts() {
     try {
       setUploadingImg(true);
 
-      const { url, public_id } = await uploadToCloudinary(file);
+      // const uploaded = await uploadToCloudinary(file);
+
+      const { url,public_id } = await uploadToCloudinary(file);
+      
 
       setForm((f) => ({
         ...f,
@@ -111,7 +113,7 @@ export default function AdminProducts() {
       setError("");
 
       const payload = {
-        id: form.id,
+        id:form.id,
         name: form.name,
         description: form.description,
         price: Number(form.price),
@@ -163,9 +165,10 @@ export default function AdminProducts() {
       name: item.name || "",
       description: item.description || "",
       price: item.price || "",
-      category: Array.isArray(item.category)
-        ? item.category[0]?.name || ""
-        : item.category || "",
+      category:
+        Array.isArray(item.category)
+          ? item.category[0]?.name || ""
+          : item.category || "",
 
       stock: item.numberOfItems ?? "",
 
@@ -184,55 +187,70 @@ export default function AdminProducts() {
   );
 
   return (
-    <div className="admin-products">
-      <div className="admin-products__header">
+    <div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 30,
+        }}
+      >
         <div>
-          <h1 className="admin-products__title">Products</h1>
-          <p className="admin-products__subtitle">{items.length} products total</p>
+          <h1>Products</h1>
+          <p>{items.length} products total</p>
         </div>
 
         <button
-          className="btn btn-primary btn-pill"
+          className="btn btn-primary"
           onClick={() => {
             setForm(EMPTY_FORM);
             setEditId(null);
             setShowForm(true);
           }}
         >
-          <i className="fa fa-plus" /> Add Product
+          Add Product
         </button>
       </div>
 
-      <div className="admin-products__search-wrapper">
-        <input
-          className="input input-pill"
-          placeholder="Search products..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <i className="fa fa-search admin-products__search-icon" />
-      </div>
+      <input
+        className="input"
+        placeholder="Search"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
       {error && (
         <div className="alert alert-danger" style={{ marginTop: 20 }}>
-          <i className="fa fa-exclamation-circle" /> {error}
+          {error}
         </div>
       )}
 
       {showForm && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2 className="modal-title">
-              <i className={`fa ${editId ? 'fa-edit' : 'fa-plus-circle'}`} />
-              {editId ? "Edit Product" : "New Product"}
-            </h2>
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,.4)",
+            display: "grid",
+            placeItems: "center",
+            zIndex: 99,
+          }}
+        >
+          <div
+            className="card"
+            style={{
+              width: 550,
+              padding: 25,
+            }}
+          >
+            <h2>{editId ? "Edit Product" : "New Product"}</h2>
 
             <form onSubmit={handleSubmit}>
-              <div className="form-group">
+              <div style={{ display: "grid", gap: 14 }}>
                 <input
-                  className="input input-pill"
+                  className="input"
                   required
-                  placeholder="Product Name"
+                  placeholder="Name"
                   value={form.name}
                   onChange={(e) =>
                     setForm((f) => ({
@@ -243,7 +261,7 @@ export default function AdminProducts() {
                 />
 
                 <textarea
-                  className="input input-rounded"
+                  className="input"
                   placeholder="Description"
                   value={form.description}
                   onChange={(e) =>
@@ -255,9 +273,9 @@ export default function AdminProducts() {
                 />
 
                 <input
-                  className="input input-pill"
+                  className="input"
                   type="number"
-                  placeholder="Price (KES)"
+                  placeholder="Price"
                   value={form.price}
                   onChange={(e) =>
                     setForm((f) => ({
@@ -268,9 +286,9 @@ export default function AdminProducts() {
                 />
 
                 <input
-                  className="input input-pill"
+                  className="input"
                   type="number"
-                  placeholder="Stock Quantity"
+                  placeholder="Stock"
                   value={form.stock}
                   onChange={(e) =>
                     setForm((f) => ({
@@ -281,7 +299,7 @@ export default function AdminProducts() {
                 />
 
                 <select
-                  className="input input-pill"
+                  className="input"
                   value={form.category}
                   onChange={(e) =>
                     setForm((f) => ({
@@ -290,23 +308,20 @@ export default function AdminProducts() {
                     }))
                   }
                 >
-                  <option value="">Select Category</option>
+                  <option value="">Select</option>
 
                   {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c.charAt(0).toUpperCase() + c.slice(1)}
+                    <option key={c}>
+                      {c}
                     </option>
                   ))}
                 </select>
 
                 {form.imageUrl && (
-                  <div className="image-preview-wrapper">
-                    <img
-                      src={getImageUrl(form.imageUrl)}
-                      className="image-preview-circle"
-                      alt="Product preview"
-                    />
-                  </div>
+                  <img
+                    src={getImageUrl(form.imageUrl)}
+                    height={40} style={{height:"40px",}}
+                  />
                 )}
 
                 <input
@@ -314,36 +329,38 @@ export default function AdminProducts() {
                   hidden
                   ref={fileRef}
                   onChange={handleImagePick}
-                  accept="image/*"
                 />
 
                 <button
                   type="button"
-                  className="btn btn-outline btn-pill"
-                  onClick={() => fileRef.current?.click()}
+                  className="btn"
+                  onClick={() =>
+                    fileRef.current?.click()
+                  }
                 >
-                  <i className="fa fa-camera" />{" "}
-                  {uploadingImg ? "Uploading..." : "Upload Image"}
+                  {uploadingImg
+                    ? "Uploading..."
+                    : "Upload Image"}
                 </button>
 
-                <div className="form-actions">
-                  <button
-                    type="submit"
-                    className="btn btn-primary btn-pill"
-                    disabled={saving}
-                  >
-                    <i className={`fa ${saving ? 'fa-spinner fa-spin' : 'fa-save'}`} />
-                    {saving ? "Saving..." : "Save Product"}
-                  </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                >
+                  {saving
+                    ? "Saving..."
+                    : "Save"}
+                </button>
 
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-pill"
-                    onClick={() => setShowForm(false)}
-                  >
-                    <i className="fa fa-times" /> Cancel
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() =>
+                    setShowForm(false)
+                  }
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>
@@ -351,71 +368,96 @@ export default function AdminProducts() {
       )}
 
       {loading ? (
-        <div className="page-loading">
-          <div className="spinner" />
-          <p>Loading products...</p>
-        </div>
+        <div>Loading...</div>
       ) : (
-        <div className="products-grid">
-          {filtered.length === 0 ? (
-            <div className="empty-state">
-              <i className="fa fa-birthday-cake" />
-              <h3>{search ? "No products match your search" : "No products available"}</h3>
-              <p>{search ? "Try adjusting your search terms" : "Start by adding your first product"}</p>
-            </div>
-          ) : (
-            filtered.map((item) => (
-              <div key={item.id} className="product-card">
-                <img
-                  src={getImageUrl(item.thumbnail)}
-                  className="product-card__image"
-                  alt={item.name}
-                />
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fill,minmax(280px,1fr))",
+            gap: 20,
+          }}
+        >
+          {filtered.map((item) => (
+            <div
+              key={item.id}
+              className="card"
+            >
+              <img
+                src={getImageUrl(item.thumbnail)}
+                style={{
+                  width: "100%",
+                  height: 200,
+                  objectFit: "cover",
+                }}
+              />
 
-                <div className="product-card__body">
-                  <h3 className="product-card__name">{item.name}</h3>
+              <div style={{ padding: 15 }}>
+                <h3>{item.name}</h3>
 
-                  <p className="product-card__category">
-                    <i className="fa fa-tag" />
-                    {Array.isArray(item.category)
-                      ? item.category.map((c) => c.name).join(", ")
-                      : item.category || "Uncategorized"}
-                  </p>
+                <p>
+                  {Array.isArray(item.category)
+                    ? item.category
+                        .map((c) => c.name)
+                        .join(", ")
+                    : item.category}
+                </p>
 
-                  <div className="product-card__stats">
-                    <span>
-                      <i className="fa fa-box" /> Stock: {item.numberOfItems || 0}
-                    </span>
-                    <span>
-                      <i className="fa fa-eye" /> Views: {item.numberofviews || 0}
-                    </span>
-                  </div>
+                <div>
+                  Stock:
+                  {" "}
+                  {item.numberOfItems}
+                </div>
 
-                  <h3 className="product-card__price">
-                    KES {Number(item.price).toLocaleString()}
-                  </h3>
+                <div>
+                  Views:
+                  {" "}
+                  {item.numberofviews}
+                </div>
 
-                  <div className="product-card__actions">
-                    <button
-                      className="btn btn-outline btn-pill btn-sm"
-                      onClick={() => openEdit(item)}
-                    >
-                      <i className="fa fa-edit" /> Edit
-                    </button>
+                <h3>
+                  KES{" "}
+                  {Number(
+                    item.price
+                  ).toLocaleString()}
+                </h3>
 
-                    <button
-                      className="btn btn-danger btn-pill btn-sm"
-                      onClick={() => handleDelete(item.id)}
-                    >
-                      <i className="fa fa-trash" /> Delete
-                    </button>
-                  </div>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                  }}
+                >
+                  <button
+                    className="btn"
+                    onClick={() =>
+                      openEdit(item)
+                    }
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    className="btn"
+                    onClick={() =>
+                      handleDelete(
+                        item.id
+                      )
+                    }
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
-            ))
-          )}
+            </div>
+          ))}
         </div>
       )}
     </div>
   );
 }
+
+
+
+
+

@@ -193,7 +193,12 @@ export default function Classes() {
                       <a href="tel:+254795404843" className="btn btn-primary btn-sm">
                         <i className="fa fa-phone" /> Call to Enroll
                       </a>
-                      <a href="https://wa.me/254707091550" className="btn btn-outline btn-sm" target="_blank" rel="noopener noreferrer">
+                      <a 
+                        href="https://wa.me/254707091550?text=Hey%20chef%20Benkiz%2C%20I%20wanna%20know%20your%20pastry%20course%20pricing" 
+                        className="btn btn-outline btn-sm" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                      >
                         <i className="fab fa-whatsapp" /> WhatsApp
                       </a>
                     </div>

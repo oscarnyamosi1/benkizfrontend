@@ -1,495 +1,332 @@
-// import axios from "axios";
 
-// const BASE_URL = import.meta.env.VITE_BASE_URL;
-
-// if (!BASE_URL) {
-//   console.error("VITE_BASE_URL is missing");
-// }
-
-// // ---------------------------------------------------------------------------
-// // AXIOS API INSTANCE
-// // ---------------------------------------------------------------------------
-
-// const api = axios.create({
-//   baseURL: `${BASE_URL}/api`,
-//   withCredentials: true,
-// });
-
-// // ---------------------------------------------------------------------------
-// // MEDIA URL HELPER
-// // ---------------------------------------------------------------------------
-
-// export const mediaUrl = (path) => {
-//   if (!path) return null;
-//   if (path.startsWith("http")) return path;
-//   return `${BASE_URL}${path}`;
-// };
-
-// // ---------------------------------------------------------------------------
-// // REFRESH TOKEN FUNCTION (FIXED)
-// // ---------------------------------------------------------------------------
-
-// async function refreshToken() {
-//   const refresh = localStorage.getItem("refresh");
-
-//   if (!refresh) throw new Error("No refresh token found");
-
-//   const res = await api.post("/auth/refresh/", { refresh });
-
-//   localStorage.setItem("access", res.data.access);
-
-//   return res.data.access;
-// }
-
-// // ---------------------------------------------------------------------------
-// // REQUEST INTERCEPTOR (attach access token)
-// // ---------------------------------------------------------------------------
-
-// api.interceptors.response.use(
-//   (res) => res,
-//   async (err) => {
-//     const original = err.config;
-
-//     if (!original || err.response?.status !== 401) {
-//       return Promise.reject(err);
-//     }
-
-//     const url = original.url || "";
-
-//     if (
-//       url.includes("/auth/login/") ||
-//       url.includes("/auth/logout/") ||
-//       url.includes("/auth/me/") ||
-//       url.includes("/auth/refresh/")
-//     ) {
-//       return Promise.reject(err);
-//     }
-
-//     if (original._retry) {
-//       return Promise.reject(err);
-//     }
-
-//     original._retry = true;
-
-//     try {
-//       const newAccess = await refreshToken();
-
-//       original.headers.Authorization = `Bearer ${newAccess}`;
-
-//       return api(original);
-//     } catch (e) {
-//       localStorage.removeItem("access");
-//       localStorage.removeItem("refresh");
-//       window.location.href = "/login";
-//       return Promise.reject(e);
-//     }
-//   }
-// );
-
-// // ---------------------------------------------------------------------------
-// // RESPONSE INTERCEPTOR (SAFE REFRESH FLOW)
-// // ---------------------------------------------------------------------------
-
-// api.interceptors.response.use(
-//   (res) => res,
-//   async (err) => {
-//     const original = err.config;
-
-//     if (!original || err.response?.status !== 401) {
-//       return Promise.reject(err);
-//     }
-
-//     const url = original.url || "";
-
-//     // prevent loop on auth endpoints
-//     if (
-//       url.includes("/auth/refresh/") ||
-//       url.includes("/auth/login/") ||
-//       url.includes("/auth/logout/")
-//     ) {
-//       return Promise.reject(err);
-//     }
-
-//     // prevent retry loop
-//     if (original._retry) {
-//       return Promise.reject(err);
-//     }
-
-//     original._retry = true;
-
-//     try {
-//       const newAccess = await refreshToken();
-
-//       original.headers.Authorization = `Bearer ${newAccess}`;
-
-//       return api(original);
-//     } catch (refreshError) {
-//       localStorage.removeItem("access");
-//       localStorage.removeItem("refresh");
-
-//       window.location.href = "/login";
-
-//       return Promise.reject(refreshError);
-//     }
-//   }
-// );
-
-// // ---------------------------------------------------------------------------
-// // ENDPOINTS
-// // ---------------------------------------------------------------------------
-
-// export const endpoints = {
-//   items: {
-//     list: (params) => api.get("/items/", { params }),
-//     get: (id) => api.get(`/items/${id}/`),
-//     search: (query) => api.get("/items/", { params: { search: query } }),
-//     categories: () => api.get("/categories/"),
-//     featured: () => api.get("/items/featured/"),
-//   },
-  
-//   auth: {
-//     login: async (credentials) => {
-//       const res = await api.post("/auth/login/", credentials);
-
-//       localStorage.setItem("access", res.data.access);
-//       localStorage.setItem("refresh", res.data.refresh);
-
-//       return res;
-//     },
-
-//     logout: () => api.post("/auth/logout/"),
-
-//     me: () => api.get("/auth/me/"),
-//   },
-
-//   admin: {
-//     dashboard: () => api.get('/admin/dashboard/'),
-
-//     products: {
-//       list:   (params)       => api.post('/admin/products/', { params }),
-//       get:    (id)           => api.get(`/admin/products/${id}/`),
-//       create: (data)         => api.create('/admin/products/create/', data),
-//       update: (id, data)     => api.patch(`/admin/products/edit/`, data),
-//       delete: (id)           => api.delete(`/admin/products/${id}/`),
-//     },
-//   },
-
-//   cart: {
-//     get: () => api.get("/cart/"),
-//     add: (itemId, quantity = 1) =>
-//       api.post("/cart/add/", { item_id: itemId, quantity }),
-//     update: (cartItemId, quantity) =>
-//       api.patch(`/cart/items/${cartItemId}/`, { quantity }),
-//     remove: (cartItemId) => api.delete(`/cart/items/${cartItemId}/`),
-//   },
-
-//   wishlist: {
-//     get: () => api.get("/wishlist/"),
-//     add: (itemId) => api.post("/wishlist/add/", { item_id: itemId }),
-//     remove: (itemId) => api.delete(`/wishlist/remove/${itemId}/`),
-//   },
-
-//   profile: {
-//     get: async () => {
-//       const res = await api.get("/profile/");
-//       return {
-//         ...res.data,
-//         profilepic: mediaUrl(res.data.profilepic),
-//       };
-//     },
-
-//     update: (data) => {
-//       const fd = new FormData();
-//       Object.keys(data).forEach((k) => fd.append(k, data[k]));
-
-//       return api.patch("/profile/", fd, {
-//         headers: { "Content-Type": "multipart/form-data" },
-//       });
-//     },
-//   },
-
-//   checkout: {
-//     complete: (data) => api.post("/checkout/", data),
-//     status: (ref) => api.get(`/payment-status/${ref}/`),
-//   },
-
-//   mpesa: {
-//     stkPush: (data) => api.post("/mpesa/stkpush/", data),
-//     status: (id) => api.get(`/mpesa/status/${id}/`),
-//   },
-// };
-
-// export default api;
-
-
-
+// api.js
 import axios from "axios";
 
-// const BASE_URL = import.meta.env.VITE_BASE_URL;
+// ---------------------------------------------------------------------------
+// CONSTANTS
+// ---------------------------------------------------------------------------
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:8000';
+const API_PATH = import.meta.env.VITE_API_PATH || '/api';
 
-// if (!BASE_URL) {
-//   console.error("VITE_BASE_URL is missing");
-// }
+if (!import.meta.env.VITE_BASE_URL) {
+  console.warn("⚠️ VITE_BASE_URL is not set, using default: http://localhost:8000");
+}
+
+// ---------------------------------------------------------------------------
+// TOKEN MANAGEMENT
+// ---------------------------------------------------------------------------
+const TOKEN_KEYS = {
+  ACCESS: 'access',
+  REFRESH: 'refresh',
+};
+
+export const tokenManager = {
+  getAccess: () => localStorage.getItem(TOKEN_KEYS.ACCESS),
+  getRefresh: () => localStorage.getItem(TOKEN_KEYS.REFRESH),
+  
+  setTokens: (access, refresh) => {
+    if (access) localStorage.setItem(TOKEN_KEYS.ACCESS, access);
+    if (refresh) localStorage.setItem(TOKEN_KEYS.REFRESH, refresh);
+  },
+  
+  clearTokens: () => {
+    localStorage.removeItem(TOKEN_KEYS.ACCESS);
+    localStorage.removeItem(TOKEN_KEYS.REFRESH);
+  },
+  
+  isAuthenticated: () => !!localStorage.getItem(TOKEN_KEYS.ACCESS),
+};
 
 // ---------------------------------------------------------------------------
 // AXIOS INSTANCES
 // ---------------------------------------------------------------------------
-const apiPath = import.meta.env.VITE_API_PATH || '/api'
-
 const api = axios.create({
-  baseURL: apiPath,
+  baseURL: `${BASE_URL}${API_PATH}`,
   withCredentials: true,
+  timeout: 30000,
 });
 
+// Separate instance for refresh to avoid interceptor loops
 const refreshApi = axios.create({
-  baseURL: apiPath,
+  baseURL: `${BASE_URL}${API_PATH}`,
   withCredentials: true,
+  timeout: 10000,
 });
 
 // ---------------------------------------------------------------------------
-// MEDIA URL HELPER
+// MEDIA URL HELPER (FIXED)
 // ---------------------------------------------------------------------------
-
 export const mediaUrl = (path) => {
   if (!path) return null;
-  if (path.startsWith("http")) return path;
-  return `${BASE_URL}${path}`;
+  if (path.startsWith('http')) return path;
+  return `${BASE_URL}${path.startsWith('/') ? path : '/' + path}`;
 };
 
 // ---------------------------------------------------------------------------
-// REFRESH TOKEN
+// REFRESH TOKEN (IMPROVED)
 // ---------------------------------------------------------------------------
+let refreshPromise = null;
 
 async function refreshToken() {
-  const refresh = localStorage.getItem("refresh");
-
-  if (!refresh) {
-    throw new Error("No refresh token");
+  // Prevent multiple concurrent refresh requests
+  if (refreshPromise) {
+    return refreshPromise;
   }
 
-  const { data } = await refreshApi.post("/auth/refresh/", {
-    refresh,
-  });
+  refreshPromise = (async () => {
+    try {
+      const refresh = tokenManager.getRefresh();
+      
+      if (!refresh) {
+        throw new Error('No refresh token available');
+      }
 
-  localStorage.setItem("access", data.access);
+      const { data } = await refreshApi.post('/auth/refresh/', { refresh });
+      
+      if (!data.access) {
+        throw new Error('Invalid refresh response');
+      }
 
-  return data.access;
+      // Store new tokens
+      tokenManager.setTokens(data.access, data.refresh || refresh);
+      
+      return data.access;
+    } catch (error) {
+      // Clear tokens on refresh failure
+      tokenManager.clearTokens();
+      throw error;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
 }
 
 // ---------------------------------------------------------------------------
-// REQUEST INTERCEPTOR
+// REQUEST INTERCEPTOR (FIXED - WAS MISSING)
 // ---------------------------------------------------------------------------
-
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("access");
-
+    const token = tokenManager.getAccess();
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
+    
+    // Set default content type if not specified
+    if (!config.headers['Content-Type'] && !(config.data instanceof FormData)) {
+      config.headers['Content-Type'] = 'application/json';
+    }
+    
     return config;
   },
   (error) => Promise.reject(error)
 );
 
 // ---------------------------------------------------------------------------
-// RESPONSE INTERCEPTOR
+// RESPONSE INTERCEPTOR (IMPROVED)
 // ---------------------------------------------------------------------------
-
 api.interceptors.response.use(
   (response) => response,
-
   async (error) => {
     const originalRequest = error.config;
-
-    if (!originalRequest) {
+    
+    // If no config or no response, reject
+    if (!originalRequest || !error.response) {
       return Promise.reject(error);
     }
 
-    if (error.response?.status !== 401) {
+    // Only handle 401 errors
+    if (error.response.status !== 401) {
       return Promise.reject(error);
     }
 
-    const url = originalRequest.url || "";
+    const url = originalRequest.url || '';
 
-    // Never refresh these endpoints
-    if (
-      url.includes("/auth/login/") ||
-      url.includes("/auth/logout/") ||
-      url.includes("/auth/me/") ||
-      url.includes("/auth/refresh/")
-    ) {
+    // Don't attempt refresh on auth endpoints
+    const authEndpoints = [
+      '/auth/login/',
+      '/auth/logout/',
+      '/auth/me/',
+      '/auth/refresh/',
+      '/auth/register/', // ✅ Added
+    ];
+    
+    if (authEndpoints.some(endpoint => url.includes(endpoint))) {
       return Promise.reject(error);
     }
 
-    // Already retried
+    // Prevent infinite retry loop
     if (originalRequest._retry) {
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
-
-      window.location.href = "/login";
-
+      tokenManager.clearTokens();
+      
+      // Redirect to login if not already there
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
+      
       return Promise.reject(error);
     }
 
     originalRequest._retry = true;
 
     try {
+      // Get new access token
       const newAccess = await refreshToken();
-
+      
+      // Update the failed request with new token
       originalRequest.headers.Authorization = `Bearer ${newAccess}`;
-
+      
+      // Retry the original request
       return api(originalRequest);
     } catch (refreshError) {
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
-
-      window.location.href = "/login";
-
+      // Refresh failed - clear tokens and redirect
+      tokenManager.clearTokens();
+      
+      // Only redirect if not already on login page
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
+      
       return Promise.reject(refreshError);
     }
   }
 );
 
 // ---------------------------------------------------------------------------
-// ENDPOINTS
+// AUTH HELPER FUNCTIONS
 // ---------------------------------------------------------------------------
+export const authHelpers = {
+  login: async (credentials) => {
+    try {
+      const response = await api.post('/auth/login/', credentials);
+      const { access, refresh } = response.data;
+      
+      tokenManager.setTokens(access, refresh);
+      
+      return response;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  },
 
+  logout: async () => {
+    try {
+      const refresh = tokenManager.getRefresh();
+      if (refresh) {
+        await api.post('/auth/logout/', { refresh });
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      tokenManager.clearTokens();
+      // Don't redirect here - let the component handle it
+    }
+  },
+
+  register: async (data) => {
+    try {
+      const response = await api.post('/auth/register/', data);
+      return response;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error; // ✅ Throw instead of return
+    }
+  },
+
+  me: async () => {
+    try {
+      const response = await api.get('/auth/me/');
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+};
+
+// ---------------------------------------------------------------------------
+// ENDPOINTS (FIXED)
+// ---------------------------------------------------------------------------
 export const endpoints = {
   items: {
-    list: (params) => api.get("/items/", { params }),
+    list: (params) => api.get('/items/', { params }),
     get: (id) => api.get(`/items/${id}/`),
-    search: (query) => api.get("/items/", { params: { search: query } }),
-    categories: () => api.get("/categories/"),
-    featured: () => api.get("/items/featured/"),
+    search: (query) => api.get('/items/', { params: { search: query } }),
+    categories: () => api.get('/categories/'),
+    featured: () => api.get('/items/featured/'),
   },
 
-  auth: {
-    login: async (credentials) => {
-      const res = await api.post("/auth/login/", credentials);
-
-      localStorage.setItem("access", res.data.access);
-      localStorage.setItem("refresh", res.data.refresh);
-
-      return res;
-    },
-
-    logout: async () => {
-      try {
-        await api.post("/auth/logout/");
-      } finally {
-        localStorage.removeItem("access");
-        localStorage.removeItem("refresh");
-      }
-    },
-    register: async (data) => {
-      try {
-        const result = await api.post("/auth/register/",data);
-        return result
-      } catch (err){
-        console.log("Little Problem !")
-        return(err)
-      }
-    },
-
-    me: () => api.get("/auth/me/"),
-  },
+  auth: authHelpers,
 
   admin: {
-    dashboard: () => api.get("/admin/dashboard/"),
+    dashboard: () => api.get('/admin/dashboard/'),
 
     products: {
-      list: (params) => api.get("/admin/products/", { params }),
-
+      list: (params) => api.get('/admin/products/', { params }), // ✅ Changed to GET
       get: (id) => api.get(`/admin/products/${id}/`),
-
-      create: (data) =>
-        api.post("/admin/products/create/", data),
-
-      update: (id, data) =>
-        api.patch(`/admin/products/${id}/`, data),
-
-      delete: (id) =>
-        api.delete(`/admin/products/${id}/`),
+      create: (data) => api.post('/admin/products/create/', data),
+      update: (id, data) => api.patch(`/admin/products/${id}/`, data),
+      delete: (id) => api.delete(`/admin/products/${id}/`),
     },
   },
 
   cart: {
-    get: () => api.get("/cart/"),
-
-    add: (itemId, quantity = 1) =>
-      api.post("/cart/add/", {
-        item_id: itemId,
-        quantity,
-      }),
-
-    update: (cartItemId, quantity) =>
-      api.patch(`/cart/items/${cartItemId}/`, {
-        quantity,
-      }),
-
-    remove: (cartItemId) =>
+    get: () => api.get('/cart/'),
+    add: (itemId, quantity = 1) => 
+      api.post('/cart/add/', { item_id: itemId, quantity }),
+    update: (cartItemId, quantity) => 
+      api.patch(`/cart/items/${cartItemId}/`, { quantity }),
+    remove: (cartItemId) => 
       api.delete(`/cart/items/${cartItemId}/`),
   },
 
   wishlist: {
-    get: () => api.get("/wishlist/"),
-
-    add: (itemId) =>
-      api.post("/wishlist/add/", {
-        item_id: itemId,
-      }),
-
-    remove: (itemId) =>
-      api.delete(`/wishlist/remove/${itemId}/`),
+    get: () => api.get('/wishlist/'),
+    add: (itemId) => api.post('/wishlist/add/', { item_id: itemId }),
+    remove: (itemId) => api.delete(`/wishlist/remove/${itemId}/`),
   },
+
   team: {
-    list: () => api.get("/team/"),
+    list: () => api.get('/team/'),
   },
+
   testimonials: {
-    list: () => api.get("/testimonials/"),
+    list: () => api.get('/testimonials/'),
   },
 
   profile: {
     get: async () => {
-      const res = await api.get("/profile/");
-
+      const res = await api.get('/profile/');
       return {
         ...res.data,
         profilepic: mediaUrl(res.data.profilepic),
       };
     },
-
     update: (data) => {
       const formData = new FormData();
-
       Object.entries(data).forEach(([key, value]) => {
         formData.append(key, value);
       });
-
-      return api.patch("/profile/", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      return api.patch('/profile/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
     },
   },
 
   checkout: {
-    complete: (data) => api.post("/checkout/", data),
-
-    status: (ref) =>
-      api.get(`/payment-status/${ref}/`),
+    complete: (data) => api.post('/checkout/', data),
+    status: (ref) => api.get(`/payment-status/${ref}/`),
   },
 
   mpesa: {
-    stkPush: (data) =>
-      api.post("/mpesa/stkpush/", data),
-
-    status: (id) =>
-      api.get(`/mpesa/status/${id}/`),
+    stkPush: (data) => api.post('/mpesa/stkpush/', data),
+    status: (id) => api.get(`/mpesa/status/${id}/`),
   },
 };
 
+// ---------------------------------------------------------------------------
+// EXPORT
+// ---------------------------------------------------------------------------
 export default api;
