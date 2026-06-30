@@ -52,7 +52,7 @@ export default function Shop() {
         }
 
         const res = await endpoints.items.list(params)
-
+   
         const data = res.data
         setItems(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [])
       } catch (err) {

@@ -38,6 +38,10 @@ export default function Home() {
   useEffect(() => {
     async function load() {
       try {
+        console.log(endpoints);
+        console.log(endpoints.items);
+        console.log(endpoints.team);
+        console.log(endpoints.testimonials);
         const [itemsRes, teamRes, testRes] = await Promise.allSettled([
           endpoints.items.list({ limit: 8 }),
           endpoints.team.list(),
@@ -45,9 +49,8 @@ export default function Home() {
         ])
         if (itemsRes.status === 'fulfilled') {
           const data = itemsRes.value.data
-          console.log(`your data ====>  ${data}`)
-          setItems(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [])
-          setItems(data)
+          console.log("oscar"+data)
+          setItems(Array.isArray(data) ? data : [] )
         }
         if (teamRes.status === 'fulfilled') {
           const data = teamRes.value.data

@@ -43,7 +43,7 @@ export default function Navbar() {
         <div className="container">
           <div className="navbar__inner">
             <Link to="/" className="navbar__logo">
-              <img src="/favicon.svg" alt="Benkiz Bakers" />
+              <img src="/logo.webp" alt="Benkiz Bakers" />
             </Link>
 
             <div className="navbar__links">
