@@ -6,7 +6,6 @@ import api from '../api/client'
 import heroImage from '../assets/hero/hero.jpg'
 import Loader from './Loader'
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-import "./styles/home.css"
 
 
 const CATEGORIES = [
@@ -83,13 +82,18 @@ export default function Home() {
     clearInterval(heroTimer.current)
   }
 
+  // const heroBg = heros[heroIndex]?.picture
+  //   ? `/media/${heros[heroIndex].picture}`
+  //   : '/static/logo_n_branding/hero/hero.jpg'
+
   const heroBg = heroImage 
+
   const heroText = heros[heroIndex]?.text || "Life's never been sweeter!"
  
   return (
     <>
       {/* HERO */}
-      <Loader />
+     <Loader />
       <section className="hero">
         <div className="hero__slide active" style={{ backgroundImage: `url(${heroBg})` }} />
         <div className="hero__overlay" />
@@ -169,8 +173,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FEATURED PRODUCTS - Updated with responsive grid */}
-      <section className="spad featured-products-section" style={{ background: 'var(--color-bg-soft)', borderTop: '1px solid var(--color-border-light)', borderBottom: '1px solid var(--color-border-light)' }}>
+      {/* FEATURED PRODUCTS */}
+      <section className="spad" style={{ background: 'var(--color-bg-soft)', borderTop: '1px solid var(--color-border-light)', borderBottom: '1px solid var(--color-border-light)' }}>
         <div className="container">
           <div className="section-title text-center">
             <span>Fresh Picks</span>
@@ -185,7 +189,7 @@ export default function Home() {
               <p>Check back soon for our latest creations!</p>
             </div>
           ) : (
-            <div className="featured-grid">
+            <div className="grid-4">
               {items.slice(0, 8).map(item => <ProductCard key={item.id} item={item} />)}
             </div>
           )}
@@ -360,6 +364,7 @@ export default function Home() {
               </a>
             </div>
 
+  
             <div
               style={{
                 display: 'flex',
@@ -385,3 +390,7 @@ export default function Home() {
     </>
   )
 }
+
+
+
+
