@@ -54,7 +54,9 @@ export function AuthProvider({ children }) {
   async function register(data) {
     const res = await endpoints.auth.register(data)
     // After register, log the user in so the session is established
-    return login(data.username, data.password)
+    // return login(data.username, data.password)
+    window.location.href = '/auth'
+    
   }
 
   async function logout() {

@@ -383,6 +383,15 @@ export const endpoints = {
         localStorage.removeItem("refresh");
       }
     },
+    register: async (data) => {
+      try {
+        const result = await api.post("/auth/register/",data);
+        return result
+      } catch (err){
+        console.log("Little Problem !")
+        return(err)
+      }
+    },
 
     me: () => api.get("/auth/me/"),
   },
