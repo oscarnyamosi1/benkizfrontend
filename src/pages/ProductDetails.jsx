@@ -93,14 +93,13 @@ export default function ProductDetails() {
   }
 
   // ✅ FIX: consistent image field
-  const imgUrl = item.thumbnail_url
-    ? (item.thumbnail_url.startsWith('http')
-        ? item.thumbnail_url
-        : `${BASE_URL}${item.thumbnail_url}`)
+  const imgUrl = item.thumbnail
+    ? (item.thumbnail.startsWith('http')
+        ? item.thumbnail
+        : `${BASE_URL}${item.thumbnail}`)
     : null
 
   const wished = isWished(item.id)
-
   return (
     <>
       <div className="breadcrumb">
