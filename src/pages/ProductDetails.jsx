@@ -92,7 +92,7 @@ export default function ProductDetails() {
     )
   }
 
-  // ✅ FIX: consistent image field
+  // ✅ FIX: consistent image field --added for fresh commit
   const imgUrl = item.thumbnail
     ? (item.thumbnail.startsWith('http')
         ? item.thumbnail
