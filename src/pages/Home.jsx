@@ -84,7 +84,7 @@ export default function Home() {
   }
 
   const heroBg = heroImage 
-  const heroText = heros[heroIndex]?.text || "Life's never been sweeter!"
+  const heroText = heros[heroIndex]?.text || "Life's never been sweeter! "
  
   return (
     <>
