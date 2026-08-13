@@ -32,6 +32,8 @@ export default function ProductCard({ item }) {
     ? (item.thumbnail.startsWith('http') ? item.thumbnail : `${BASE_URL}${item.thumbnail}`)
     : null
 
+
+
   const handleImageError = () => {
     setImgError(true)
   }

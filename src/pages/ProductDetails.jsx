@@ -28,14 +28,11 @@ export default function ProductDetails() {
         const data = res.data
         setItem(data)
 
-        // ✅ FIX: use category ID instead of full object
         const categoryId = data.category?.[0]?.id
 
         if (categoryId) {
           const relRes = await endpoints.items.list({ category: categoryId })
-
           const relItems = relRes.data.results || relRes.data || []
-
           setRelated(
             relItems
               .filter(r => r.id !== parseInt(id))
@@ -92,14 +89,23 @@ export default function ProductDetails() {
     )
   }
 
-  // ✅ FIX: consistent image field --added for fresh commit
+
   const imgUrl = item.thumbnail
     ? (item.thumbnail.startsWith('http')
-        ? item.thumbnail
+        ? item.thumbnail 
         : `${BASE_URL}${item.thumbnail}`)
     : null
 
   const wished = isWished(item.id)
+
+  // ── WhatsApp link ──────────────────────────────────────────────
+  const productUrl = window.location.href; 
+  const whatsappNumber = '254742790542';   
+  const message = `I wanna buy this product: ${item.name} - Price: Shs. ${item.price} - ${item.description || ''} - View here: ${productUrl}`;
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+  // ──────────────────────────────────────────────────────────────
+
   return (
     <>
       <div className="breadcrumb">
@@ -225,9 +231,20 @@ export default function ProductDetails() {
                   </>
                 ) : (
                   <Link to="/auth" className="btn btn-primary btn-lg">
-                    Login to Order
+                    Log in to Order
                   </Link>
                 )}
+
+                {/* ─── REPLACED: Order via WhatsApp with dynamic link ─── */}
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary btn-lg"
+                >
+                  <i className="fab fa-whatsapp" /> Order via WhatsApp
+                </a>
+                {/* ────────────────────────────────────────────────────── */}
               </div>
 
               {/* META */}
