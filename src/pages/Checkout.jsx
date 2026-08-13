@@ -51,7 +51,7 @@ export default function Checkout() {
 
               {error && <div className="alert alert-error">{error}</div>}
 
-              <div className="payment-option" style={{ cursor: 'pointer' }} onClick={() => setPaymentMethod('mpesa')}
+              <div style={{ cursor: 'pointer' }} onClick={() => setPaymentMethod('mpesa')}
                 className={`payment-option ${paymentMethod === 'mpesa' ? 'selected' : ''}`}
               >
                 <div style={{ width: 20, height: 20, borderRadius: '50%', border: `2px solid ${paymentMethod === 'mpesa' ? 'var(--color-primary)' : 'var(--color-border)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
