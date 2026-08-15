@@ -1,62 +1,74 @@
-import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { endpoints } from '../api/client'
-import { useCart } from '../context/CartContext'
-import { useWishlist } from '../context/WishlistContext'
-import { useAuth } from '../context/AuthContext'
-import ProductCard from '../components/ProductCard'
+import { useState, useEffect, useRef } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { endpoints } from '../api/client';
+import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
+import { useAuth } from '../context/AuthContext';
+import ProductCard from '../components/ProductCard';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function ProductDetails() {
-  const { id } = useParams()
-  const { user } = useAuth()
-  const { addToCart } = useCart()
-  const { isWished, addToWishlist, removeFromWishlist } = useWishlist()
+  const { id } = useParams();
+  const { user } = useAuth();
+  const { addToCart } = useCart();
+  const { isWished, addToWishlist, removeFromWishlist } = useWishlist();
 
-  const [item, setItem] = useState(null)
-  const [related, setRelated] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState('description')
-  const [adding, setAdding] = useState(false)
+  const [item, setItem] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('description');
+  const [adding, setAdding] = useState(false);
+  const [whatsappDropdownOpen, setWhatsappDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setWhatsappDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     async function load() {
-      setLoading(true)
+      setLoading(true);
       try {
-        const res = await endpoints.items.get(id)
-        const data = res.data
-        setItem(data)
+        const res = await endpoints.items.get(id);
+        const data = res.data;
+        setItem(data);
 
-        const categoryId = data.category?.[0]?.id
+        const categoryId = data.category?.[0]?.id;
 
         if (categoryId) {
-          const relRes = await endpoints.items.list({ category: categoryId })
-          const relItems = relRes.data.results || relRes.data || []
+          const relRes = await endpoints.items.list({ category: categoryId });
+          const relItems = relRes.data.results || relRes.data || [];
           setRelated(
             relItems
-              .filter(r => r.id !== parseInt(id))
+              .filter((r) => r.id !== parseInt(id))
               .slice(0, 4)
-          )
+          );
         }
-
       } catch (err) {
-        console.error('Failed to load product:', err)
+        console.error('Failed to load product:', err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    load()
-  }, [id])
+    load();
+  }, [id]);
 
   async function handleAddToCart() {
-    if (!user) return
-    setAdding(true)
+    if (!user) return;
+    setAdding(true);
     try {
-      await addToCart(item.id)
+      await addToCart(item.id);
     } finally {
-      setAdding(false)
+      setAdding(false);
     }
   }
 
@@ -65,7 +77,7 @@ export default function ProductDetails() {
       <div className="page-loading">
         <div className="spinner" />
       </div>
-    )
+    );
   }
 
   if (!item) {
@@ -77,7 +89,7 @@ export default function ProductDetails() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
         }}
       >
         <i className="fa fa-birthday-cake" />
@@ -86,25 +98,25 @@ export default function ProductDetails() {
           Back to Shop
         </Link>
       </div>
-    )
+    );
   }
 
-
   const imgUrl = item.thumbnail
-    ? (item.thumbnail.startsWith('http')
-        ? item.thumbnail 
-        : `${BASE_URL}${item.thumbnail}`)
-    : null
+    ? item.thumbnail.startsWith('http')
+      ? item.thumbnail
+      : `${BASE_URL}${item.thumbnail}`
+    : null;
 
-  const wished = isWished(item.id)
+  const wished = isWished(item.id);
 
-  // ── WhatsApp link ──────────────────────────────────────────────
-  const productUrl = window.location.href; 
-  const whatsappNumber = '254742790542';   
+  // ── WhatsApp links ──────────────────────────────────────────────
+  const productUrl = window.location.href;
+  const whatsappNumber = '254742790542';
+  const whatsappNumberKisii = '254707091550';
   const message = `I wanna buy this product: ${item.name} - Price: Shs. ${item.price} - ${item.description || ''} - View here: ${productUrl}`;
   const encodedMessage = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-  // ──────────────────────────────────────────────────────────────
+  const whatsappUrlKisii = `https://wa.me/${whatsappNumberKisii}?text=${encodedMessage}`;
 
   return (
     <>
@@ -122,7 +134,6 @@ export default function ProductDetails() {
       <section className="spad">
         <div className="container">
           <div className="grid-2" style={{ gap: 48, alignItems: 'flex-start' }}>
-
             {/* IMAGE */}
             <div>
               <div
@@ -131,7 +142,7 @@ export default function ProductDetails() {
                   overflow: 'hidden',
                   background: 'var(--color-bg-muted)',
                   aspectRatio: '1',
-                  marginBottom: 16
+                  marginBottom: 16,
                 }}
               >
                 {imgUrl ? (
@@ -147,7 +158,7 @@ export default function ProductDetails() {
                       height: '100%',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center'
+                      justifyContent: 'center',
                     }}
                   >
                     <i className="fa fa-birthday-cake" style={{ fontSize: 80 }} />
@@ -158,8 +169,6 @@ export default function ProductDetails() {
 
             {/* DETAILS */}
             <div>
-
-              {/* ✅ FIXED CATEGORY */}
               {Array.isArray(item.category) && item.category.length > 0 && (
                 <div
                   className="product-card__category-wrapper"
@@ -188,7 +197,7 @@ export default function ProductDetails() {
                   fontSize: 28,
                   fontWeight: 700,
                   color: 'var(--color-primary)',
-                  marginBottom: 16
+                  marginBottom: 16,
                 }}
               >
                 Shs. {Number(item.price || 0).toLocaleString()}
@@ -201,7 +210,7 @@ export default function ProductDetails() {
               )}
 
               {/* ACTIONS */}
-              <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+              <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
                 {user ? (
                   <>
                     <button
@@ -218,12 +227,10 @@ export default function ProductDetails() {
                       className={`navbar__icon-btn ${wished ? 'wished' : ''}`}
                       style={{
                         width: 52,
-                        height: 52
+                        height: 52,
                       }}
                       onClick={() =>
-                        wished
-                          ? removeFromWishlist(item.id)
-                          : addToWishlist(item.id)
+                        wished ? removeFromWishlist(item.id) : addToWishlist(item.id)
                       }
                     >
                       <i className={`fa${wished ? 's' : 'r'} fa-heart`} />
@@ -231,19 +238,69 @@ export default function ProductDetails() {
                   </>
                 ) : (
                   <Link to="/auth" className="btn btn-primary btn-lg">
-                    Log in to Order
+                    Log in to Order on official website
                   </Link>
                 )}
 
-                {/* ─── REPLACED: Order via WhatsApp with dynamic link ─── */}
-                <a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary btn-lg"
-                >
-                  <i className="fab fa-whatsapp" /> Order via WhatsApp
-                </a>
+                {/* ─── WhatsApp dropdown ────────────────────────────── */}
+                <div ref={dropdownRef} style={{ position: 'relative', display: 'inline-block' }}>
+                  <button
+                    className="btn btn-primary btn-lg"
+                    onClick={() => setWhatsappDropdownOpen(!whatsappDropdownOpen)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                  >
+                    <i className="fab fa-whatsapp" /> Order via WhatsApp{' '}
+                    <i className={`fa ${whatsappDropdownOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`} />
+                  </button>
+
+                  {whatsappDropdownOpen && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        marginTop: 4,
+                        background: 'white',
+                        border: '1px solid #ddd',
+                        borderRadius: 8,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                        zIndex: 1000,
+                        minWidth: 200,
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <a
+                        href={whatsappUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'block',
+                          padding: '10px 16px',
+                          color: '#333',
+                          textDecoration: 'none',
+                          borderBottom: '1px solid #f0f0f0',
+                        }}
+                        onClick={() => setWhatsappDropdownOpen(false)}
+                      >
+                        <i className="fab fa-whatsapp" style={{ marginRight: 8, color: '#25D366' }} /> Homabay
+                      </a>
+                      <a
+                        href={whatsappUrlKisii}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'block',
+                          padding: '10px 16px',
+                          color: '#333',
+                          textDecoration: 'none',
+                        }}
+                        onClick={() => setWhatsappDropdownOpen(false)}
+                      >
+                        <i className="fab fa-whatsapp" style={{ marginRight: 8, color: '#25D366' }} /> Kisii
+                      </a>
+                    </div>
+                  )}
+                </div>
                 {/* ────────────────────────────────────────────────────── */}
               </div>
 
@@ -258,7 +315,6 @@ export default function ProductDetails() {
                   )}
                 </div>
               </div>
-
             </div>
           </div>
 
@@ -269,7 +325,7 @@ export default function ProductDetails() {
                 { key: 'description', label: 'Description' },
                 { key: 'info', label: 'Additional Info' },
                 { key: 'views', label: `Views (${item.numberofviews ?? 0})` },
-              ].map(tab => (
+              ].map((tab) => (
                 <button
                   key={tab.key}
                   className={`tab-btn ${activeTab === tab.key ? 'active' : ''}`}
@@ -302,7 +358,7 @@ export default function ProductDetails() {
               </div>
 
               <div className="grid-4">
-                {related.map(r => (
+                {related.map((r) => (
                   <ProductCard key={r.id} item={r} />
                 ))}
               </div>
@@ -311,5 +367,5 @@ export default function ProductDetails() {
         </div>
       </section>
     </>
-  )
+  );
 }
