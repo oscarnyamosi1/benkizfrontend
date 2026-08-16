@@ -307,9 +307,9 @@ export default function ProductDetails() {
               {/* META */}
               <div style={{ padding: 16 }}>
                 <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                  {item.numberOfItems !== undefined && (
+                  {/* {item.numberOfItems !== undefined && (
                     <span>{item.numberOfItems} in stock</span>
-                  )}
+                  )} */}
                   {item.numberofviews !== undefined && (
                     <span>{item.numberofviews} views</span>
                   )}
