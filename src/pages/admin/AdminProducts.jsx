@@ -283,6 +283,7 @@ export default function AdminProducts() {
                 <select
                   className="input input-pill"
                   value={form.category}
+                  multiple={true}
                   onChange={(e) =>
                     setForm((f) => ({
                       ...f,
