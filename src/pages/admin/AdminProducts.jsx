@@ -11,23 +11,13 @@ const EMPTY_FORM = {
   name: "",
   description: "",
   price: "",
-  category: "",
+  category: [],
   stock: "",
   imageUrl: "",
   imagePublicId: "",
 };
 
-const CATEGORIES = [
-  "cakes",
-  "bread",
-  "pastries",
-  "drinks",
-  "cupcakes",
-  "cookies",
-  "macarons",
-  "wedding",
-  "birthday",
-];
+
 
 export default function AdminProducts() {
   const { user } = useAuth();
@@ -37,6 +27,8 @@ export default function AdminProducts() {
 
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
+
+  const [CATEGORIES,setCategories] =useState([])
 
   const [form, setForm] = useState(EMPTY_FORM);
 
@@ -62,10 +54,12 @@ export default function AdminProducts() {
     try {
       setLoading(true);
 
+      
+      setCategories((await endpoints.items.categories()).data.map((category) => category.label));
+
+
       const res = await endpoints.admin.products.list(user);
-
-      console.log("Products:", res.data);
-
+  
       setItems(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
@@ -163,9 +157,13 @@ export default function AdminProducts() {
       name: item.name || "",
       description: item.description || "",
       price: item.price || "",
+      // category: Array.isArray(item.category)
+      //   ? item.category[0]?.name || ""
+      //   : item.category || "",
+
       category: Array.isArray(item.category)
-        ? item.category[0]?.name || ""
-        : item.category || "",
+        ? item.category.map(c => typeof c === 'string' ? c : c.name)
+        : (item.category ? [item.category] : []),
 
       stock: item.numberOfItems ?? "",
 
@@ -283,15 +281,20 @@ export default function AdminProducts() {
                 <select
                   className="input input-pill"
                   value={form.category}
-                  multiple={true}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      category: e.target.value,
-                    }))
-                  }
-                >
-                  <option value="">Select Category</option>
+                  multiple
+                  // onChange={(e) =>
+                  //   setForm((f) => ({
+                  //     ...f,
+                  //     category: e.target.value,
+                  //   }))
+                  // }
+
+                  onChange={(e) => {
+                    const selected = Array.from(e.target.selectedOptions, opt => opt.label);
+                    setForm(prev => ({ ...prev, category: selected }));
+                  }}
+              >
+                  <option >Select Category</option>
 
                   {CATEGORIES.map((c) => (
                     <option key={c} value={c}>

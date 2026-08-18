@@ -5,15 +5,15 @@ import ProductCard from '../components/ProductCard'
 
 const CATEGORIES = [
   'all',
-  'redvelvet',
+  'red',
   'cupcake',
   'biscuit',
   'cookies',
   'wedding',
   'macarons',
   'cake',
-  'anniversarycake',
-  'birthdaycake'
+  'anniversary',
+  'birthday'
 ]
 
 export default function Shop() {

@@ -9,7 +9,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:8000';
 const API_PATH = import.meta.env.VITE_API_PATH || '/api';
 
 if (!import.meta.env.VITE_BASE_URL) {
-  console.warn("⚠️ VITE_BASE_URL is not set, using default: http://localhost:8000");
+  console.warn("VITE_BASE_URL is not set, using default: http://localhost:8000");
 }
 
 // ---------------------------------------------------------------------------
